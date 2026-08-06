@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Greenloop FZC</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0b3d2e, #1e8c5a);
+    }
+
+    .login-box {
+      width: 90%;
+      max-width: 420px;
+      padding: 42px 32px;
+      text-align: center;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+    }
+
+    .logo {
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 7px solid #25a96b;
+      border-radius: 50%;
+      color: #25a96b;
+      font-size: 38px;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin: 0;
+      color: #123f2e;
+      font-size: 29px;
+    }
+
+    p {
+      color: #777;
+      margin: 10px 0 28px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d5d5d5;
+      border-radius: 9px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    input:focus {
+      border-color: #25a96b;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      border: none;
+      border-radius: 9px;
+      background: #168653;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0f6e43;
+    }
+
+    #error {
+      display: none;
+      margin-top: 15px;
+      color: #d52222;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-box">
+    <div class="logo">↻</div>
+
+    <h1>Greenloop FZC</h1>
+    <p>Please enter your password to continue.</p>
+
+    <input type="password" id="password" placeholder="Enter Password" />
+    <button onclick="login()">Login</button>
+
+    <div id="error">Incorrect password. Please try again.</div>
+  </div>
+
+  <script>
+    function login() {
+      const password = document.getElementById("password").value;
+      const correctPassword = "greenloop123";
+
+      if (password === correctPassword) {
+        window.location.href = "dashboard.html";
+      } else {
+        document.getElementById("error").style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>
