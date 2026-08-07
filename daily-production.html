@@ -4,147 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daily Production | Greenloop FZC</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: #f3f7f4;
-      color: #163d2d;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 8%;
-      background: #0b5b38;
-      color: white;
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .header-logo {
-      width: 55px;
-      height: 42px;
-      object-fit: contain;
-    }
-
-    .top-nav {
-      padding: 14px 8%;
-      display: flex;
-      gap: 12px;
-      background: #e5f3ea;
-    }
-
-    .top-nav a {
-      padding: 10px 16px;
-      color: #0b5b38;
-      background: white;
-      border-radius: 7px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    main {
-      max-width: 1050px;
-      margin: auto;
-      padding: 35px 20px;
-    }
-
-    .form-box, .table-box {
-      margin-top: 25px;
-      padding: 25px;
-      border-radius: 14px;
-      background: white;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 7px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #cfd8d2;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-
-    .select-add {
-      display: flex;
-      gap: 7px;
-    }
-
-    .select-add select {
-      flex: 1;
-    }
-
-    .add-btn {
-      padding: 0 13px;
-      border: none;
-      border-radius: 8px;
-      background: #0b5b38;
-      color: white;
-      font-size: 21px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .save-btn {
-      margin-top: 24px;
-      padding: 13px 28px;
-      border: none;
-      border-radius: 8px;
-      background: #168653;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .save-btn:hover, .add-btn:hover {
-      background: #084429;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-    }
-
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #e2e7e4;
-      text-align: left;
-    }
-
-    th {
-      background: #e7f5ec;
-    }
-
-    .delete-btn {
-      padding: 7px 10px;
-      border: none;
-      border-radius: 6px;
-      background: #d84343;
-      color: white;
-      cursor: pointer;
-    }
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #f3f7f4; color: #163d2d; }
+    header { display: flex; align-items: center; gap: 12px; padding: 14px 8%; background: #0b5b38; color: white; font-size: 22px; font-weight: bold; }
+    .header-logo { width: 55px; height: 42px; object-fit: contain; }
+    .top-nav { padding: 14px 8%; display: flex; gap: 12px; flex-wrap: wrap; background: #e5f3ea; }
+    .top-nav a { padding: 10px 16px; color: #0b5b38; background: white; border-radius: 7px; text-decoration: none; font-weight: bold; }
+    main { max-width: 1200px; margin: auto; padding: 35px 20px; }
+    .box { margin-top: 25px; padding: 25px; border-radius: 14px; background: white; box-shadow: 0 4px 18px rgba(0,0,0,.08); }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; }
+    label { display: block; margin-bottom: 7px; font-weight: bold; font-size: 14px; }
+    input, select { width: 100%; padding: 12px; border: 1px solid #cfd8d2; border-radius: 8px; font-size: 15px; }
+    .select-add { display: flex; gap: 7px; }
+    .select-add select { flex: 1; }
+    .add-btn { padding: 0 13px; border: none; border-radius: 8px; background: #0b5b38; color: white; font-size: 21px; font-weight: bold; cursor: pointer; }
+    .save-btn { margin-top: 24px; padding: 13px 28px; border: none; border-radius: 8px; background: #168653; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .info { margin-top: 20px; padding: 16px; border-radius: 8px; background: #e7f5ec; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { padding: 11px; border-bottom: 1px solid #e2e7e4; text-align: center; }
+    th { background: #0b5b38; color: white; }
+    .delete-btn { padding: 7px 10px; border: none; border-radius: 6px; background: #d84343; color: white; cursor: pointer; }
   </style>
 </head>
 
@@ -162,9 +42,9 @@
 
   <main>
     <h1>Daily Production</h1>
-    <p>Enter daily production details below.</p>
+    <p>Day-end stock aur export quantity enter karein. Production automatically calculate hogi.</p>
 
-    <div class="form-box">
+    <div class="box">
       <div class="form-grid">
         <div>
           <label>Date</label>
@@ -204,16 +84,32 @@
         </div>
 
         <div>
-          <label>Produced Quantity</label>
-          <input type="number" id="quantity" min="1" placeholder="Enter quantity">
+          <label>Opening Stock</label>
+          <input type="number" id="openingStock" min="0" placeholder="First entry ke liye enter karein">
+        </div>
+
+        <div>
+          <label>Export / Out Quantity</label>
+          <input type="number" id="exportQty" min="0" value="0">
+        </div>
+
+        <div>
+          <label>Day End Stock</label>
+          <input type="number" id="closingStock" min="0" placeholder="Enter day-end count">
         </div>
       </div>
 
-      <button class="save-btn" type="button" onclick="saveRecord()">Save Production Record</button>
+      <div class="info">
+        <strong>Today Production:</strong> <span id="productionPreview">0</span> units
+        <br>
+        <small>Formula: Day End Stock − Opening Stock + Export Quantity</small>
+      </div>
+
+      <button class="save-btn" type="button" onclick="saveRecord()">Save Daily Production</button>
     </div>
 
-    <div class="table-box">
-      <h2>Production Records</h2>
+    <div class="box">
+      <h2>Daily Production Records</h2>
 
       <table>
         <thead>
@@ -223,11 +119,13 @@
             <th>GB</th>
             <th>Color</th>
             <th>Grade</th>
-            <th>Produced Quantity</th>
+            <th>Opening</th>
+            <th>Export</th>
+            <th>Day End</th>
+            <th>Production</th>
             <th>Delete</th>
           </tr>
         </thead>
-
         <tbody id="records"></tbody>
       </table>
     </div>
@@ -236,69 +134,152 @@
   <script>
     const defaultOptions = {
       model: ["iPhone 13", "Samsung S23"],
-      storage: ["64 GB", "128 GB", "256 GB"],
-      color: ["Black", "White", "Blue", "Green"],
+      storage: ["-", "64 GB", "128 GB", "256 GB"],
+      color: ["-", "Black", "White", "Blue", "Green"],
       grade: ["A", "B", "Bulges A", "Bulges B"]
     };
 
     function loadOptions(id) {
-      const savedOptions = JSON.parse(localStorage.getItem(id + "Options"));
-      const options = savedOptions || defaultOptions[id];
-      const select = document.getElementById(id);
+      let options = JSON.parse(localStorage.getItem(id + "Options")) || defaultOptions[id];
 
+      defaultOptions[id].forEach(function(item) {
+        if (!options.includes(item)) options.push(item);
+      });
+
+      localStorage.setItem(id + "Options", JSON.stringify(options));
+
+      const select = document.getElementById(id);
       select.innerHTML = "";
 
       options.forEach(function(option) {
-        const newOption = document.createElement("option");
-        newOption.value = option;
-        newOption.textContent = option;
-        select.appendChild(newOption);
+        select.innerHTML += `<option value="${option}">${option}</option>`;
       });
     }
 
     function addOption(id) {
-      const newValue = prompt("Enter new option:");
+      const value = prompt("Enter new option:");
 
-      if (newValue && newValue.trim() !== "") {
-        const savedOptions = JSON.parse(localStorage.getItem(id + "Options")) || defaultOptions[id];
+      if (!value || value.trim() === "") return;
 
-        if (!savedOptions.includes(newValue.trim())) {
-          savedOptions.push(newValue.trim());
-          localStorage.setItem(id + "Options", JSON.stringify(savedOptions));
-          loadOptions(id);
-          document.getElementById(id).value = newValue.trim();
-        }
+      const options = JSON.parse(localStorage.getItem(id + "Options")) || defaultOptions[id];
+
+      if (!options.includes(value.trim())) {
+        options.push(value.trim());
+        localStorage.setItem(id + "Options", JSON.stringify(options));
+        loadOptions(id);
       }
+
+      document.getElementById(id).value = value.trim();
+      updateOpeningStock();
+    }
+
+    function getRecords() {
+      return JSON.parse(localStorage.getItem("productionRecords")) || [];
+    }
+
+    function sameProduct(record) {
+      return record.model === document.getElementById("model").value &&
+             record.storage === document.getElementById("storage").value &&
+             record.color === document.getElementById("color").value &&
+             record.grade === document.getElementById("grade").value;
+    }
+
+    function updateOpeningStock() {
+      const date = document.getElementById("date").value;
+      const openingInput = document.getElementById("openingStock");
+
+      if (!date) return;
+
+      const oldRecords = getRecords().filter(function(record) {
+        return sameProduct(record) &&
+          record.date < date &&
+          record.closingStock !== undefined;
+      });
+
+      oldRecords.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+      });
+
+      if (oldRecords.length > 0) {
+        openingInput.value = oldRecords[0].closingStock;
+        openingInput.readOnly = true;
+        openingInput.style.background = "#eef6f0";
+      } else {
+        openingInput.readOnly = false;
+        openingInput.style.background = "white";
+      }
+
+      updateProductionPreview();
+    }
+
+    function updateProductionPreview() {
+      const opening = Number(document.getElementById("openingStock").value) || 0;
+      const exportQty = Number(document.getElementById("exportQty").value) || 0;
+      const closing = Number(document.getElementById("closingStock").value) || 0;
+
+      const production = closing - opening + exportQty;
+      document.getElementById("productionPreview").textContent = production;
     }
 
     function saveRecord() {
-      const quantity = document.getElementById("quantity").value;
+      const date = document.getElementById("date").value;
+      const opening = Number(document.getElementById("openingStock").value);
+      const exportQty = Number(document.getElementById("exportQty").value) || 0;
+      const closing = Number(document.getElementById("closingStock").value);
 
-      if (!quantity) {
-        alert("Please enter Produced Quantity.");
+      if (!date || Number.isNaN(opening) || Number.isNaN(closing)) {
+        alert("Please enter Date, Opening Stock and Day End Stock.");
+        return;
+      }
+
+      const production = closing - opening + exportQty;
+
+      if (production < 0) {
+        alert("Production cannot be negative. Please check stock and export quantity.");
         return;
       }
 
       const record = {
-        date: document.getElementById("date").value,
+        date: date,
         model: document.getElementById("model").value,
         storage: document.getElementById("storage").value,
         color: document.getElementById("color").value,
         grade: document.getElementById("grade").value,
-        quantity: quantity
+        openingStock: opening,
+        exportQty: exportQty,
+        closingStock: closing,
+        production: production
       };
 
-      const records = JSON.parse(localStorage.getItem("productionRecords")) || [];
-      records.push(record);
-      localStorage.setItem("productionRecords", JSON.stringify(records));
+      const records = getRecords();
 
-      document.getElementById("quantity").value = "";
+      const sameDayIndex = records.findIndex(function(item) {
+        return item.date === record.date &&
+          item.model === record.model &&
+          item.storage === record.storage &&
+          item.color === record.color &&
+          item.grade === record.grade;
+      });
+
+      if (sameDayIndex >= 0) {
+        records[sameDayIndex] = record;
+      } else {
+        records.push(record);
+      }
+
+      localStorage.setItem("productionRecords", JSON.stringify(records));
       showRecords();
+      updateOpeningStock();
+      alert("Daily production saved successfully.");
     }
 
     function showRecords() {
-      const records = JSON.parse(localStorage.getItem("productionRecords")) || [];
       const table = document.getElementById("records");
+      const records = getRecords();
+
+      records.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+      });
 
       table.innerHTML = "";
 
@@ -310,7 +291,10 @@
             <td>${record.storage || ""}</td>
             <td>${record.color || ""}</td>
             <td>${record.grade || ""}</td>
-            <td>${record.quantity || ""}</td>
+            <td>${record.openingStock ?? ""}</td>
+            <td>${record.exportQty ?? ""}</td>
+            <td>${record.closingStock ?? ""}</td>
+            <td><strong>${record.production ?? ""}</strong></td>
             <td><button class="delete-btn" onclick="deleteRecord(${index})">Delete</button></td>
           </tr>
         `;
@@ -318,19 +302,31 @@
     }
 
     function deleteRecord(index) {
-      const records = JSON.parse(localStorage.getItem("productionRecords")) || [];
+      const records = getRecords();
+      records.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+      });
+
       records.splice(index, 1);
       localStorage.setItem("productionRecords", JSON.stringify(records));
       showRecords();
+      updateOpeningStock();
     }
 
     document.getElementById("date").valueAsDate = new Date();
 
-    loadOptions("model");
-    loadOptions("storage");
-    loadOptions("color");
-    loadOptions("grade");
+    ["model", "storage", "color", "grade"].forEach(function(id) {
+      loadOptions(id);
+      document.getElementById(id).addEventListener("change", updateOpeningStock);
+    });
+
+    document.getElementById("date").addEventListener("change", updateOpeningStock);
+    document.getElementById("openingStock").addEventListener("input", updateProductionPreview);
+    document.getElementById("exportQty").addEventListener("input", updateProductionPreview);
+    document.getElementById("closingStock").addEventListener("input", updateProductionPreview);
+
     showRecords();
+    updateOpeningStock();
   </script>
 </body>
 </html>
