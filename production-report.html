@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Production Reports | Greenloop FZC</title>
+
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
     body { margin: 0; background: #f3f7f4; color: #163d2d; }
@@ -11,7 +12,7 @@
     .header-logo { width: 55px; height: 42px; object-fit: contain; }
     .top-nav { padding: 14px 8%; display: flex; gap: 12px; flex-wrap: wrap; background: #e5f3ea; }
     .top-nav a { padding: 10px 16px; color: #0b5b38; background: white; border-radius: 7px; text-decoration: none; font-weight: bold; }
-    main { max-width: 1250px; margin: auto; padding: 35px 20px; }
+    main { max-width: 1300px; margin: auto; padding: 35px 20px; }
     .box { margin-top: 25px; padding: 25px; border-radius: 14px; background: white; box-shadow: 0 4px 18px rgba(0,0,0,.08); overflow-x: auto; }
     .filters { display: flex; gap: 15px; align-items: end; flex-wrap: wrap; }
     label { display: block; margin-bottom: 7px; font-weight: bold; }
@@ -58,13 +59,14 @@
     </div>
 
     <div class="box">
-      <h2>Closing Stock by Model and Grade</h2>
-      <p>Stock is shown as at the selected To Date.</p>
+      <h2>Closing Stock Summary</h2>
 
       <table>
         <thead>
           <tr>
             <th>Model</th>
+            <th>GB</th>
+            <th>Color</th>
             <th>Grade A</th>
             <th>Grade B</th>
             <th>Bulges A</th>
@@ -72,6 +74,7 @@
             <th>Total Stock</th>
           </tr>
         </thead>
+
         <tbody id="stockTable"></tbody>
         <tfoot id="stockTotals"></tfoot>
       </table>
@@ -88,12 +91,12 @@
             <th>GB</th>
             <th>Color</th>
             <th>Grade</th>
-            <th>Opening</th>
-            <th>Export</th>
-            <th>Day End</th>
             <th>Production</th>
+            <th>Export</th>
+            <th>Day End Stock</th>
           </tr>
         </thead>
+
         <tbody id="detailsTable"></tbody>
         <tfoot id="productionTotals"></tfoot>
       </table>
@@ -108,16 +111,15 @@
     }
 
     function showReport() {
-      const fromDate = document.getElementById("fromDate").value;
+      const fromDate = document.getElementById("fromDate").value || "0000-01-01";
       const toDate = document.getElementById("toDate").value || "9999-12-31";
       const allRecords = getRecords();
 
-      const dateRecords = allRecords.filter(function(record) {
-        return record.date >= (fromDate || "0000-01-01") &&
-               record.date <= toDate;
+      const filteredRecords = allRecords.filter(function(record) {
+        return record.date >= fromDate && record.date <= toDate;
       });
 
-      dateRecords.sort(function(a, b) {
+      filteredRecords.sort(function(a, b) {
         return a.date.localeCompare(b.date);
       });
 
@@ -132,9 +134,12 @@
       let totalProduction = 0;
       let totalExport = 0;
 
-      dateRecords.forEach(function(record) {
-        totalProduction += Number(record.production) || 0;
-        totalExport += Number(record.exportQty) || 0;
+      filteredRecords.forEach(function(record) {
+        const production = Number(record.production) || Number(record.quantity) || 0;
+        const exportQty = Number(record.exportQty) || 0;
+
+        totalProduction += production;
+        totalExport += exportQty;
 
         detailsTable.innerHTML += `
           <tr>
@@ -143,52 +148,61 @@
             <td>${record.storage}</td>
             <td>${record.color}</td>
             <td>${record.grade}</td>
-            <td>${record.openingStock ?? ""}</td>
-            <td>${record.exportQty ?? ""}</td>
+            <td>${production}</td>
+            <td>${exportQty}</td>
             <td>${record.closingStock ?? ""}</td>
-            <td><strong>${record.production ?? ""}</strong></td>
           </tr>
         `;
       });
 
-      if (dateRecords.length === 0) {
-        emptyMessage.textContent = "Selected dates mein koi record available nahi hai.";
+      if (filteredRecords.length === 0) {
+        emptyMessage.textContent = "No records available for the selected dates.";
       } else {
         productionTotals.innerHTML = `
           <tr>
-            <td colspan="6">Grand Total</td>
+            <td colspan="5">Grand Total</td>
+            <td>${totalProduction}</td>
             <td>${totalExport}</td>
             <td></td>
-            <td>${totalProduction}</td>
           </tr>
         `;
       }
 
-      const latestByItem = {};
+      const latestByGrade = {};
 
       allRecords.forEach(function(record) {
         if (record.date <= toDate && record.closingStock !== undefined) {
           const key = record.model + "|" + record.storage + "|" + record.color + "|" + record.grade;
 
-          if (!latestByItem[key] || latestByItem[key].date < record.date) {
-            latestByItem[key] = record;
+          if (!latestByGrade[key] || latestByGrade[key].date <= record.date) {
+            latestByGrade[key] = record;
           }
         }
       });
 
-      const modelSummary = {};
+      const stockSummary = {};
 
-      Object.values(latestByItem).forEach(function(record) {
-        if (!modelSummary[record.model]) {
-          modelSummary[record.model] = { A: 0, B: 0, bulgesA: 0, bulgesB: 0 };
+      Object.values(latestByGrade).forEach(function(record) {
+        const key = record.model + "|" + record.storage + "|" + record.color;
+
+        if (!stockSummary[key]) {
+          stockSummary[key] = {
+            model: record.model,
+            storage: record.storage,
+            color: record.color,
+            gradeA: 0,
+            gradeB: 0,
+            bulgesA: 0,
+            bulgesB: 0
+          };
         }
 
         const stock = Number(record.closingStock) || 0;
 
-        if (record.grade === "A") modelSummary[record.model].A += stock;
-        if (record.grade === "B") modelSummary[record.model].B += stock;
-        if (record.grade === "Bulges A") modelSummary[record.model].bulgesA += stock;
-        if (record.grade === "Bulges B") modelSummary[record.model].bulgesB += stock;
+        if (record.grade === "A") stockSummary[key].gradeA += stock;
+        if (record.grade === "B") stockSummary[key].gradeB += stock;
+        if (record.grade === "Bulges A") stockSummary[key].bulgesA += stock;
+        if (record.grade === "Bulges B") stockSummary[key].bulgesB += stock;
       });
 
       const stockTable = document.getElementById("stockTable");
@@ -197,39 +211,43 @@
       stockTable.innerHTML = "";
       stockTotals.innerHTML = "";
 
-      let grandA = 0, grandB = 0, grandBulgesA = 0, grandBulgesB = 0;
+      let totalA = 0;
+      let totalB = 0;
+      let totalBulgesA = 0;
+      let totalBulgesB = 0;
 
-      Object.keys(modelSummary).sort().forEach(function(model) {
-        const row = modelSummary[model];
-        const total = row.A + row.B + row.bulgesA + row.bulgesB;
+      Object.values(stockSummary).forEach(function(item) {
+        const totalStock = item.gradeA + item.gradeB + item.bulgesA + item.bulgesB;
 
-        grandA += row.A;
-        grandB += row.B;
-        grandBulgesA += row.bulgesA;
-        grandBulgesB += row.bulgesB;
+        totalA += item.gradeA;
+        totalB += item.gradeB;
+        totalBulgesA += item.bulgesA;
+        totalBulgesB += item.bulgesB;
 
         stockTable.innerHTML += `
           <tr>
-            <td>${model}</td>
-            <td>${row.A}</td>
-            <td>${row.B}</td>
-            <td>${row.bulgesA}</td>
-            <td>${row.bulgesB}</td>
-            <td><strong>${total}</strong></td>
+            <td>${item.model}</td>
+            <td>${item.storage}</td>
+            <td>${item.color}</td>
+            <td>${item.gradeA}</td>
+            <td>${item.gradeB}</td>
+            <td>${item.bulgesA}</td>
+            <td>${item.bulgesB}</td>
+            <td><strong>${totalStock}</strong></td>
           </tr>
         `;
       });
 
-      const allStock = grandA + grandB + grandBulgesA + grandBulgesB;
+      const grandTotal = totalA + totalB + totalBulgesA + totalBulgesB;
 
       stockTotals.innerHTML = `
         <tr>
-          <td>Grand Total</td>
-          <td>${grandA}</td>
-          <td>${grandB}</td>
-          <td>${grandBulgesA}</td>
-          <td>${grandBulgesB}</td>
-          <td>${allStock}</td>
+          <td colspan="3">Grand Total</td>
+          <td>${totalA}</td>
+          <td>${totalB}</td>
+          <td>${totalBulgesA}</td>
+          <td>${totalBulgesB}</td>
+          <td>${grandTotal}</td>
         </tr>
       `;
     }
