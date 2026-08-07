@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Greenloop FZC</title>
 
   <style>
@@ -25,18 +25,18 @@
       max-width: 420px;
       padding: 42px 32px;
       text-align: center;
-      background: #ffffff;
+      background: white;
       border-radius: 18px;
       box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
     }
 
     .logo {
-  width: 145px;
-  height: 95px;
-  object-fit: contain;
-  margin: 0 auto 18px;
-  display: block;
-}
+      width: 145px;
+      height: 95px;
+      object-fit: contain;
+      margin: 0 auto 18px;
+      display: block;
+    }
 
     h1 {
       margin: 0;
@@ -95,14 +95,18 @@
     <h1>Greenloop FZC</h1>
     <p>Please enter your password to continue.</p>
 
-    <input type="password" id="password" placeholder="Enter Password" />
-    <button onclick="login()">Login</button>
+    <form onsubmit="login(event)">
+      <input type="password" id="password" placeholder="Enter Password" required>
+      <button type="submit">Login</button>
+    </form>
 
     <div id="error">Incorrect password. Please try again.</div>
   </div>
 
   <script>
-    function login() {
+    function login(event) {
+      event.preventDefault();
+
       const password = document.getElementById("password").value;
       const correctPassword = "1122";
 
