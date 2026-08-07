@@ -1,3 +1,6 @@
+`daily-production.html` ka poora code delete karke ye updated complete code paste karein. Ismein **Product Type**, **Waste Quantity**, aur **Operator Name** hata diye hain. Naya **Grade** dropdown add kiya hai: A, B, C — aur `+` se naya grade bhi add kar sakte hain.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,13 +54,9 @@
     }
 
     main {
-      max-width: 1150px;
+      max-width: 1050px;
       margin: auto;
       padding: 35px 20px;
-    }
-
-    h1 {
-      margin-top: 0;
     }
 
     .form-box, .table-box {
@@ -149,16 +148,6 @@
       color: white;
       cursor: pointer;
     }
-
-    @media (max-width: 650px) {
-      table {
-        font-size: 12px;
-      }
-
-      th, td {
-        padding: 8px 4px;
-      }
-    }
   </style>
 </head>
 
@@ -182,14 +171,6 @@
         <div>
           <label>Date</label>
           <input type="date" id="date">
-        </div>
-
-        <div>
-          <label>Product Type</label>
-          <div class="select-add">
-            <select id="product"></select>
-            <button class="add-btn" type="button" onclick="addOption('product')">+</button>
-          </div>
         </div>
 
         <div>
@@ -217,18 +198,16 @@
         </div>
 
         <div>
+          <label>Grade</label>
+          <div class="select-add">
+            <select id="grade"></select>
+            <button class="add-btn" type="button" onclick="addOption('grade')">+</button>
+          </div>
+        </div>
+
+        <div>
           <label>Produced Quantity</label>
           <input type="number" id="quantity" min="1" placeholder="Enter quantity">
-        </div>
-
-        <div>
-          <label>Rejected / Waste Quantity</label>
-          <input type="number" id="waste" min="0" value="0">
-        </div>
-
-        <div>
-          <label>Operator Name</label>
-          <input type="text" id="operator" placeholder="Enter operator name">
         </div>
       </div>
 
@@ -242,13 +221,11 @@
         <thead>
           <tr>
             <th>Date</th>
-            <th>Product</th>
             <th>Model</th>
             <th>GB</th>
             <th>Color</th>
-            <th>Produced</th>
-            <th>Waste</th>
-            <th>Operator</th>
+            <th>Grade</th>
+            <th>Produced Quantity</th>
             <th>Delete</th>
           </tr>
         </thead>
@@ -260,10 +237,10 @@
 
   <script>
     const defaultOptions = {
-      product: ["Mobile Phone", "Accessory"],
       model: ["iPhone 13", "Samsung S23"],
       storage: ["64 GB", "128 GB", "256 GB"],
-      color: ["Black", "White", "Blue", "Green"]
+      color: ["Black", "White", "Blue", "Green"],
+      grade: ["A", "B", "C"]
     };
 
     function loadOptions(id) {
@@ -298,22 +275,19 @@
 
     function saveRecord() {
       const quantity = document.getElementById("quantity").value;
-      const operator = document.getElementById("operator").value;
 
-      if (!quantity || !operator) {
-        alert("Please enter Produced Quantity and Operator Name.");
+      if (!quantity) {
+        alert("Please enter Produced Quantity.");
         return;
       }
 
       const record = {
         date: document.getElementById("date").value,
-        product: document.getElementById("product").value,
         model: document.getElementById("model").value,
         storage: document.getElementById("storage").value,
         color: document.getElementById("color").value,
-        quantity: quantity,
-        waste: document.getElementById("waste").value,
-        operator: operator
+        grade: document.getElementById("grade").value,
+        quantity: quantity
       };
 
       const records = JSON.parse(localStorage.getItem("productionRecords")) || [];
@@ -321,9 +295,6 @@
       localStorage.setItem("productionRecords", JSON.stringify(records));
 
       document.getElementById("quantity").value = "";
-      document.getElementById("waste").value = "0";
-      document.getElementById("operator").value = "";
-
       showRecords();
     }
 
@@ -336,14 +307,12 @@
       records.forEach(function(record, index) {
         table.innerHTML += `
           <tr>
-            <td>${record.date}</td>
-            <td>${record.product}</td>
-            <td>${record.model}</td>
-            <td>${record.storage}</td>
-            <td>${record.color}</td>
-            <td>${record.quantity}</td>
-            <td>${record.waste}</td>
-            <td>${record.operator}</td>
+            <td>${record.date || ""}</td>
+            <td>${record.model || ""}</td>
+            <td>${record.storage || ""}</td>
+            <td>${record.color || ""}</td>
+            <td>${record.grade || ""}</td>
+            <td>${record.quantity || ""}</td>
             <td><button class="delete-btn" onclick="deleteRecord(${index})">Delete</button></td>
           </tr>
         `;
@@ -359,11 +328,12 @@
 
     document.getElementById("date").valueAsDate = new Date();
 
-    loadOptions("product");
     loadOptions("model");
     loadOptions("storage");
     loadOptions("color");
+    loadOptions("grade");
     showRecords();
   </script>
 </body>
 </html>
+```
