@@ -1,64 +1,488 @@
-function saveRecord() {
-  const date = document.getElementById("date").value;
-  const production = Number(document.getElementById("productionQty").value);
-  const exportQty = Number(document.getElementById("exportQty").value) || 0;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Production | Greenloop FZC</title>
 
-  if (!date || Number.isNaN(production)) {
-    alert("Please enter Date and Produced Quantity.");
-    return;
-  }
-
-  const previousStock = getPreviousStock();
-
-  const record = {
-    date: date,
-    model: document.getElementById("model").value,
-    storage: document.getElementById("storage").value,
-    color: document.getElementById("color").value,
-    grade: document.getElementById("grade").value,
-    production: production,
-    exportQty: exportQty,
-    openingStock: previousStock,
-    closingStock: previousStock + production - exportQty
-  };
-
-  const records = getRecords();
-
-  const existingIndex = records.findIndex(function(item) {
-    return item.date === record.date &&
-      item.model === record.model &&
-      item.storage === record.storage &&
-      item.color === record.color &&
-      item.grade === record.grade;
-  });
-
-  if (existingIndex >= 0) {
-    const oldRecord = records[existingIndex];
-    const totalProduction = (Number(oldRecord.production) || Number(oldRecord.quantity) || 0) + production;
-    const totalExport = (Number(oldRecord.exportQty) || 0) + exportQty;
-    const openingStock = Number(oldRecord.openingStock) || previousStock;
-
-    records[existingIndex] = {
-      ...record,
-      production: totalProduction,
-      exportQty: totalExport,
-      openingStock: openingStock,
-      closingStock: openingStock + totalProduction - totalExport
-    };
-  } else {
-    if (record.closingStock < 0) {
-      alert("Export quantity is more than available stock.");
-      return;
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
     }
 
-    records.push(record);
-  }
+    body {
+      margin: 0;
+      background: #f3f7f4;
+      color: #163d2d;
+    }
 
-  localStorage.setItem("productionRecords", JSON.stringify(records));
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 8%;
+      background: #0b5b38;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+    }
 
-  document.getElementById("productionQty").value = "";
-  document.getElementById("exportQty").value = "0";
+    .header-logo {
+      width: 55px;
+      height: 42px;
+      object-fit: contain;
+    }
 
-  showRecords();
-  updateStockPreview();
-}
+    .top-nav {
+      padding: 14px 8%;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: #e5f3ea;
+    }
+
+    .top-nav a {
+      padding: 10px 16px;
+      color: #0b5b38;
+      background: white;
+      border-radius: 7px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 35px 20px;
+    }
+
+    .box {
+      margin-top: 25px;
+      padding: 25px;
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      overflow-x: auto;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cfd8d2;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    .select-add {
+      display: flex;
+      gap: 7px;
+    }
+
+    .select-add select {
+      flex: 1;
+    }
+
+    .add-btn {
+      padding: 0 13px;
+      border: none;
+      border-radius: 8px;
+      background: #0b5b38;
+      color: white;
+      font-size: 21px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .save-btn {
+      margin-top: 24px;
+      padding: 13px 28px;
+      border: none;
+      border-radius: 8px;
+      background: #168653;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .info {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      background: #e7f5ec;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    th, td {
+      padding: 11px;
+      border-bottom: 1px solid #e2e7e4;
+      text-align: center;
+    }
+
+    th {
+      background: #0b5b38;
+      color: white;
+    }
+
+    .delete-btn {
+      padding: 7px 10px;
+      border: none;
+      border-radius: 6px;
+      background: #d84343;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">
+    Greenloop FZC
+  </header>
+
+  <nav class="top-nav">
+    <a href="dashboard.html">← Dashboard</a>
+    <a href="index.html">⌂ Home / Login</a>
+    <a href="production-report.html">📊 Reports</a>
+  </nav>
+
+  <main>
+    <h1>Daily Production</h1>
+    <p>Enter production and export quantities.</p>
+
+    <div class="box">
+      <div class="form-grid">
+        <div>
+          <label>Date</label>
+          <input type="date" id="date">
+        </div>
+
+        <div>
+          <label>Model</label>
+          <div class="select-add">
+            <select id="model"></select>
+            <button class="add-btn" type="button" onclick="addOption('model')">+</button>
+          </div>
+        </div>
+
+        <div>
+          <label>Storage / GB</label>
+          <div class="select-add">
+            <select id="storage"></select>
+            <button class="add-btn" type="button" onclick="addOption('storage')">+</button>
+          </div>
+        </div>
+
+        <div>
+          <label>Color</label>
+          <div class="select-add">
+            <select id="color"></select>
+            <button class="add-btn" type="button" onclick="addOption('color')">+</button>
+          </div>
+        </div>
+
+        <div>
+          <label>Grade</label>
+          <div class="select-add">
+            <select id="grade"></select>
+            <button class="add-btn" type="button" onclick="addOption('grade')">+</button>
+          </div>
+        </div>
+
+        <div>
+          <label>Produced Quantity</label>
+          <input type="number" id="productionQty" min="0" placeholder="Enter quantity">
+        </div>
+
+        <div>
+          <label>Export / Out Quantity</label>
+          <input type="number" id="exportQty" min="0" value="0">
+        </div>
+      </div>
+
+      <div class="info">
+        <strong>Calculated Day End Stock:</strong>
+        <span id="stockPreview">0</span> units
+        <br>
+        <small>Previous Stock + Production − Export</small>
+      </div>
+
+      <button class="save-btn" type="button" onclick="saveRecord()">Save Daily Production</button>
+    </div>
+
+    <div class="box">
+      <h2>Daily Production Records</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Model</th>
+            <th>GB</th>
+            <th>Color</th>
+            <th>Grade</th>
+            <th>Production</th>
+            <th>Export</th>
+            <th>Day End Stock</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+
+        <tbody id="records"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const defaultOptions = {
+      model: ["iPhone 13", "Samsung S23"],
+      storage: ["-", "64 GB", "128 GB", "256 GB"],
+      color: ["-", "Black", "White", "Blue", "Green"],
+      grade: ["A", "B", "Bulges A", "Bulges B"]
+    };
+
+    function getRecords() {
+      return JSON.parse(localStorage.getItem("productionRecords")) || [];
+    }
+
+    function loadOptions(id) {
+      let options = JSON.parse(localStorage.getItem(id + "Options")) || defaultOptions[id];
+
+      defaultOptions[id].forEach(function(item) {
+        if (!options.includes(item)) {
+          options.push(item);
+        }
+      });
+
+      localStorage.setItem(id + "Options", JSON.stringify(options));
+
+      const select = document.getElementById(id);
+      select.innerHTML = "";
+
+      options.forEach(function(item) {
+        select.innerHTML += `<option value="${item}">${item}</option>`;
+      });
+    }
+
+    function addOption(id) {
+      const value = prompt("Enter new option:");
+
+      if (!value || value.trim() === "") {
+        return;
+      }
+
+      const options = JSON.parse(localStorage.getItem(id + "Options")) || defaultOptions[id];
+
+      if (!options.includes(value.trim())) {
+        options.push(value.trim());
+        localStorage.setItem(id + "Options", JSON.stringify(options));
+        loadOptions(id);
+      }
+
+      document.getElementById(id).value = value.trim();
+      updateStockPreview();
+    }
+
+    function getPreviousStock() {
+      const date = document.getElementById("date").value;
+      const model = document.getElementById("model").value;
+      const storage = document.getElementById("storage").value;
+      const color = document.getElementById("color").value;
+      const grade = document.getElementById("grade").value;
+
+      const previousRecords = getRecords().filter(function(record) {
+        return record.date < date &&
+          record.model === model &&
+          record.storage === storage &&
+          record.color === color &&
+          record.grade === grade &&
+          record.closingStock !== undefined;
+      });
+
+      previousRecords.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+      });
+
+      return previousRecords.length > 0
+        ? Number(previousRecords[0].closingStock)
+        : 0;
+    }
+
+    function getSameDayRecord() {
+      const date = document.getElementById("date").value;
+      const model = document.getElementById("model").value;
+      const storage = document.getElementById("storage").value;
+      const color = document.getElementById("color").value;
+      const grade = document.getElementById("grade").value;
+
+      return getRecords().find(function(record) {
+        return record.date === date &&
+          record.model === model &&
+          record.storage === storage &&
+          record.color === color &&
+          record.grade === grade;
+      });
+    }
+
+    function updateStockPreview() {
+      const previousStock = getPreviousStock();
+      const sameDayRecord = getSameDayRecord();
+
+      const oldProduction = sameDayRecord
+        ? Number(sameDayRecord.production) || Number(sameDayRecord.quantity) || 0
+        : 0;
+
+      const oldExport = sameDayRecord
+        ? Number(sameDayRecord.exportQty) || 0
+        : 0;
+
+      const production = Number(document.getElementById("productionQty").value) || 0;
+      const exportQty = Number(document.getElementById("exportQty").value) || 0;
+
+      const closingStock = previousStock + oldProduction + production - oldExport - exportQty;
+
+      document.getElementById("stockPreview").textContent = closingStock;
+    }
+
+    function saveRecord() {
+      const date = document.getElementById("date").value;
+      const production = Number(document.getElementById("productionQty").value);
+      const exportQty = Number(document.getElementById("exportQty").value) || 0;
+
+      if (!date || Number.isNaN(production)) {
+        alert("Please enter Date and Produced Quantity.");
+        return;
+      }
+
+      const previousStock = getPreviousStock();
+
+      const record = {
+        date: date,
+        model: document.getElementById("model").value,
+        storage: document.getElementById("storage").value,
+        color: document.getElementById("color").value,
+        grade: document.getElementById("grade").value,
+        production: production,
+        exportQty: exportQty,
+        openingStock: previousStock,
+        closingStock: previousStock + production - exportQty
+      };
+
+      const records = getRecords();
+
+      const existingIndex = records.findIndex(function(item) {
+        return item.date === record.date &&
+          item.model === record.model &&
+          item.storage === record.storage &&
+          item.color === record.color &&
+          item.grade === record.grade;
+      });
+
+      if (existingIndex >= 0) {
+        const oldRecord = records[existingIndex];
+        const totalProduction = (Number(oldRecord.production) || Number(oldRecord.quantity) || 0) + production;
+        const totalExport = (Number(oldRecord.exportQty) || 0) + exportQty;
+        const openingStock = Number(oldRecord.openingStock) || previousStock;
+
+        records[existingIndex] = {
+          ...record,
+          production: totalProduction,
+          exportQty: totalExport,
+          openingStock: openingStock,
+          closingStock: openingStock + totalProduction - totalExport
+        };
+      } else {
+        if (record.closingStock < 0) {
+          alert("Export quantity is more than available stock.");
+          return;
+        }
+
+        records.push(record);
+      }
+
+      localStorage.setItem("productionRecords", JSON.stringify(records));
+
+      document.getElementById("productionQty").value = "";
+      document.getElementById("exportQty").value = "0";
+
+      showRecords();
+      updateStockPreview();
+    }
+
+    function showRecords() {
+      const table = document.getElementById("records");
+      const records = getRecords();
+
+      records.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+      });
+
+      table.innerHTML = "";
+
+      records.forEach(function(record, index) {
+        table.innerHTML += `
+          <tr>
+            <td>${record.date || ""}</td>
+            <td>${record.model || ""}</td>
+            <td>${record.storage || ""}</td>
+            <td>${record.color || ""}</td>
+            <td>${record.grade || ""}</td>
+            <td>${record.production ?? record.quantity ?? ""}</td>
+            <td>${record.exportQty ?? 0}</td>
+            <td><strong>${record.closingStock ?? ""}</strong></td>
+            <td><button class="delete-btn" onclick="deleteRecord(${index})">Delete</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function deleteRecord(index) {
+      const records = getRecords();
+
+      records.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+      });
+
+      records.splice(index, 1);
+      localStorage.setItem("productionRecords", JSON.stringify(records));
+
+      showRecords();
+      updateStockPreview();
+    }
+
+    document.getElementById("date").valueAsDate = new Date();
+
+    ["model", "storage", "color", "grade"].forEach(function(id) {
+      loadOptions(id);
+      document.getElementById(id).addEventListener("change", updateStockPreview);
+    });
+
+    document.getElementById("date").addEventListener("change", updateStockPreview);
+    document.getElementById("productionQty").addEventListener("input", updateStockPreview);
+    document.getElementById("exportQty").addEventListener("input", updateStockPreview);
+
+    showRecords();
+    updateStockPreview();
+  </script>
+</body>
+</html>
