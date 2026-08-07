@@ -4,91 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Production Reports | Greenloop FZC</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: #f3f7f4;
-      color: #163d2d;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 8%;
-      background: #0b5b38;
-      color: white;
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .header-logo {
-      width: 55px;
-      height: 42px;
-      object-fit: contain;
-    }
-
-    .top-nav {
-      padding: 14px 8%;
-      display: flex;
-      gap: 12px;
-      background: #e5f3ea;
-    }
-
-    .top-nav a {
-      padding: 10px 16px;
-      color: #0b5b38;
-      background: white;
-      border-radius: 7px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    main {
-      max-width: 1100px;
-      margin: auto;
-      padding: 35px 20px;
-    }
-
-    .report-box {
-      padding: 25px;
-      border-radius: 14px;
-      background: white;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 14px;
-      border-bottom: 1px solid #e2e7e4;
-      text-align: center;
-    }
-
-    th {
-      background: #0b5b38;
-      color: white;
-    }
-
-    td:first-child, th:first-child {
-      text-align: left;
-    }
-
-    .empty {
-      padding: 20px;
-      text-align: center;
-      color: #777;
-    }
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #f3f7f4; color: #163d2d; }
+    header { display: flex; align-items: center; gap: 12px; padding: 14px 8%; background: #0b5b38; color: white; font-size: 22px; font-weight: bold; }
+    .header-logo { width: 55px; height: 42px; object-fit: contain; }
+    .top-nav { padding: 14px 8%; display: flex; gap: 12px; flex-wrap: wrap; background: #e5f3ea; }
+    .top-nav a { padding: 10px 16px; color: #0b5b38; background: white; border-radius: 7px; text-decoration: none; font-weight: bold; }
+    main { max-width: 1250px; margin: auto; padding: 35px 20px; }
+    .box { margin-top: 25px; padding: 25px; border-radius: 14px; background: white; box-shadow: 0 4px 18px rgba(0,0,0,.08); overflow-x: auto; }
+    .filters { display: flex; gap: 15px; align-items: end; flex-wrap: wrap; }
+    label { display: block; margin-bottom: 7px; font-weight: bold; }
+    input { padding: 11px; border: 1px solid #cfd8d2; border-radius: 8px; font-size: 15px; }
+    button { padding: 12px 20px; border: none; border-radius: 8px; background: #168653; color: white; font-weight: bold; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { padding: 12px; border-bottom: 1px solid #e2e7e4; text-align: center; }
+    th { background: #0b5b38; color: white; }
+    td:first-child, th:first-child { text-align: left; }
+    tfoot td { background: #e7f5ec; font-weight: bold; }
+    .empty { padding: 18px; text-align: center; color: #777; }
   </style>
 </head>
 
@@ -106,9 +40,27 @@
 
   <main>
     <h1>Daily Production Reports</h1>
-    <p>Model-wise production stock summary.</p>
 
-    <div class="report-box">
+    <div class="box">
+      <div class="filters">
+        <div>
+          <label>From Date</label>
+          <input type="date" id="fromDate">
+        </div>
+
+        <div>
+          <label>To Date</label>
+          <input type="date" id="toDate">
+        </div>
+
+        <button onclick="showReport()">Show Report</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>Closing Stock by Model and Grade</h2>
+      <p>Stock is shown as at the selected To Date.</p>
+
       <table>
         <thead>
           <tr>
@@ -117,11 +69,33 @@
             <th>Grade B</th>
             <th>Bulges A</th>
             <th>Bulges B</th>
-            <th>Total</th>
+            <th>Total Stock</th>
           </tr>
         </thead>
+        <tbody id="stockTable"></tbody>
+        <tfoot id="stockTotals"></tfoot>
+      </table>
+    </div>
 
-        <tbody id="reportTable"></tbody>
+    <div class="box">
+      <h2>Date-wise Production Details</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Model</th>
+            <th>GB</th>
+            <th>Color</th>
+            <th>Grade</th>
+            <th>Opening</th>
+            <th>Export</th>
+            <th>Day End</th>
+            <th>Production</th>
+          </tr>
+        </thead>
+        <tbody id="detailsTable"></tbody>
+        <tfoot id="productionTotals"></tfoot>
       </table>
 
       <div id="emptyMessage" class="empty"></div>
@@ -129,71 +103,138 @@
   </main>
 
   <script>
+    function getRecords() {
+      return JSON.parse(localStorage.getItem("productionRecords")) || [];
+    }
+
     function showReport() {
-      const records = JSON.parse(localStorage.getItem("productionRecords")) || [];
-      const report = {};
+      const fromDate = document.getElementById("fromDate").value;
+      const toDate = document.getElementById("toDate").value || "9999-12-31";
+      const allRecords = getRecords();
 
-      records.forEach(function(record) {
-        const model = record.model || "Unknown Model";
-        const grade = record.grade || "";
-        const quantity = Number(record.quantity) || 0;
+      const dateRecords = allRecords.filter(function(record) {
+        return record.date >= (fromDate || "0000-01-01") &&
+               record.date <= toDate;
+      });
 
-        if (!report[model]) {
-          report[model] = {
-            gradeA: 0,
-            gradeB: 0,
-            bulgesA: 0,
-            bulgesB: 0
-          };
-        }
+      dateRecords.sort(function(a, b) {
+        return a.date.localeCompare(b.date);
+      });
 
-        if (grade === "A") {
-          report[model].gradeA += quantity;
-        }
+      const detailsTable = document.getElementById("detailsTable");
+      const productionTotals = document.getElementById("productionTotals");
+      const emptyMessage = document.getElementById("emptyMessage");
 
-        if (grade === "B") {
-          report[model].gradeB += quantity;
-        }
+      detailsTable.innerHTML = "";
+      productionTotals.innerHTML = "";
+      emptyMessage.textContent = "";
 
-        if (grade === "Bulges A") {
-          report[model].bulgesA += quantity;
-        }
+      let totalProduction = 0;
+      let totalExport = 0;
 
-        if (grade === "Bulges B") {
-          report[model].bulgesB += quantity;
+      dateRecords.forEach(function(record) {
+        totalProduction += Number(record.production) || 0;
+        totalExport += Number(record.exportQty) || 0;
+
+        detailsTable.innerHTML += `
+          <tr>
+            <td>${record.date}</td>
+            <td>${record.model}</td>
+            <td>${record.storage}</td>
+            <td>${record.color}</td>
+            <td>${record.grade}</td>
+            <td>${record.openingStock ?? ""}</td>
+            <td>${record.exportQty ?? ""}</td>
+            <td>${record.closingStock ?? ""}</td>
+            <td><strong>${record.production ?? ""}</strong></td>
+          </tr>
+        `;
+      });
+
+      if (dateRecords.length === 0) {
+        emptyMessage.textContent = "Selected dates mein koi record available nahi hai.";
+      } else {
+        productionTotals.innerHTML = `
+          <tr>
+            <td colspan="6">Grand Total</td>
+            <td>${totalExport}</td>
+            <td></td>
+            <td>${totalProduction}</td>
+          </tr>
+        `;
+      }
+
+      const latestByItem = {};
+
+      allRecords.forEach(function(record) {
+        if (record.date <= toDate && record.closingStock !== undefined) {
+          const key = record.model + "|" + record.storage + "|" + record.color + "|" + record.grade;
+
+          if (!latestByItem[key] || latestByItem[key].date < record.date) {
+            latestByItem[key] = record;
+          }
         }
       });
 
-      const table = document.getElementById("reportTable");
-      const emptyMessage = document.getElementById("emptyMessage");
+      const modelSummary = {};
 
-      table.innerHTML = "";
-      emptyMessage.textContent = "";
+      Object.values(latestByItem).forEach(function(record) {
+        if (!modelSummary[record.model]) {
+          modelSummary[record.model] = { A: 0, B: 0, bulgesA: 0, bulgesB: 0 };
+        }
 
-      const models = Object.keys(report);
+        const stock = Number(record.closingStock) || 0;
 
-      if (models.length === 0) {
-        emptyMessage.textContent = "No production records available yet.";
-        return;
-      }
+        if (record.grade === "A") modelSummary[record.model].A += stock;
+        if (record.grade === "B") modelSummary[record.model].B += stock;
+        if (record.grade === "Bulges A") modelSummary[record.model].bulgesA += stock;
+        if (record.grade === "Bulges B") modelSummary[record.model].bulgesB += stock;
+      });
 
-      models.forEach(function(model) {
-        const item = report[model];
-        const total = item.gradeA + item.gradeB + item.bulgesA + item.bulgesB;
+      const stockTable = document.getElementById("stockTable");
+      const stockTotals = document.getElementById("stockTotals");
 
-        table.innerHTML += `
+      stockTable.innerHTML = "";
+      stockTotals.innerHTML = "";
+
+      let grandA = 0, grandB = 0, grandBulgesA = 0, grandBulgesB = 0;
+
+      Object.keys(modelSummary).sort().forEach(function(model) {
+        const row = modelSummary[model];
+        const total = row.A + row.B + row.bulgesA + row.bulgesB;
+
+        grandA += row.A;
+        grandB += row.B;
+        grandBulgesA += row.bulgesA;
+        grandBulgesB += row.bulgesB;
+
+        stockTable.innerHTML += `
           <tr>
             <td>${model}</td>
-            <td>${item.gradeA}</td>
-            <td>${item.gradeB}</td>
-            <td>${item.bulgesA}</td>
-            <td>${item.bulgesB}</td>
+            <td>${row.A}</td>
+            <td>${row.B}</td>
+            <td>${row.bulgesA}</td>
+            <td>${row.bulgesB}</td>
             <td><strong>${total}</strong></td>
           </tr>
         `;
       });
+
+      const allStock = grandA + grandB + grandBulgesA + grandBulgesB;
+
+      stockTotals.innerHTML = `
+        <tr>
+          <td>Grand Total</td>
+          <td>${grandA}</td>
+          <td>${grandB}</td>
+          <td>${grandBulgesA}</td>
+          <td>${grandBulgesB}</td>
+          <td>${allStock}</td>
+        </tr>
+      `;
     }
 
+    document.getElementById("toDate").valueAsDate = new Date();
     showReport();
   </script>
 </body>
