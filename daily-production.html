@@ -1,198 +1,578 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Daily Production | Greenloop FZC</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{box-sizing:border-box;font-family:Arial}body{margin:0;background:#f3f7f4;color:#163d2d}header{padding:15px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}.logo{width:55px;height:42px;vertical-align:middle;object-fit:contain;margin-right:12px}nav{padding:14px 8%;background:#e5f3ea}nav a{background:#fff;color:#0b5b38;padding:10px 16px;margin-right:8px;border-radius:7px;text-decoration:none;font-weight:bold}main{max-width:1200px;margin:auto;padding:30px 20px}.box{background:#fff;padding:25px;margin-top:22px;border-radius:14px;box-shadow:0 4px 18px #0002;overflow:auto}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}label{display:block;font-weight:bold;font-size:14px;margin-bottom:7px}input,select{width:100%;padding:12px;border:1px solid #cfd8d2;border-radius:8px}.actions{display:flex;gap:6px}.actions select{flex:1}button{border:0;border-radius:8px;color:#fff;font-weight:bold;cursor:pointer}.add{background:#0b5b38;padding:0 12px;font-size:20px}.remove,.delete{background:#d84343;padding:7px 10px}.save{background:#168653;padding:13px 28px;margin-top:22px}.info{background:#e7f5ec;padding:15px;border-radius:8px;margin-top:18px}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{padding:11px;border-bottom:1px solid #ddd;text-align:center}th{background:#0b5b38;color:#fff}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Production | Greenloop FZC</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+
+    body {
+      margin: 0;
+      background: #f3f7f4;
+      color: #163d2d;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 8%;
+      background: #0b5b38;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .logo {
+      width: 55px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    nav {
+      padding: 14px 8%;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: #e5f3ea;
+    }
+
+    nav a {
+      padding: 10px 16px;
+      color: #0b5b38;
+      background: white;
+      border-radius: 7px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 35px 20px;
+    }
+
+    .box {
+      margin-top: 25px;
+      padding: 25px;
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      overflow-x: auto;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cfd8d2;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .actions select {
+      flex: 1;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .add {
+      padding: 0 12px;
+      background: #0b5b38;
+      font-size: 20px;
+    }
+
+    .remove, .delete-btn {
+      padding: 7px 10px;
+      background: #d84343;
+    }
+
+    .save-btn {
+      margin-top: 24px;
+      padding: 13px 28px;
+      background: #168653;
+      font-size: 16px;
+    }
+
+    .info {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      background: #e7f5ec;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    th, td {
+      padding: 11px;
+      border-bottom: 1px solid #e2e7e4;
+      text-align: center;
+    }
+
+    th {
+      background: #0b5b38;
+      color: white;
+    }
+  </style>
 </head>
+
 <body>
-<header><img src="looplogo.jpg" class="logo">Greenloop FZC</header>
-<nav>
-<a href="dashboard.html">← Dashboard</a>
-<a href="index.html">⌂ Home / Login</a>
-<a href="production-report.html">📊 Reports</a>
-</nav>
+  <header>
+    <img src="looplogo.jpg" alt="Greenloop Logo" class="logo">
+    Greenloop FZC
+  </header>
 
-<main>
-<h1>Daily Production</h1>
+  <nav>
+    <a href="dashboard.html">← Dashboard</a>
+    <a href="index.html">⌂ Home / Login</a>
+    <a href="production-report.html">📊 Reports</a>
+  </nav>
 
-<div class="box">
-<div class="grid">
-<div><label>Date</label><input type="date" id="date"></div>
+  <main>
+    <h1>Daily Production</h1>
+    <p>Enter production and export quantities.</p>
 
-<div><label>Model</label><div class="actions">
-<select id="model"></select><button class="add" onclick="addOption('model')">+</button><button class="remove" onclick="deleteOption('model')">−</button>
-</div></div>
+    <div class="box">
+      <div class="form-grid">
+        <div>
+          <label>Date</label>
+          <input type="date" id="date">
+        </div>
 
-<div><label>Storage / GB</label><div class="actions">
-<select id="storage"></select><button class="add" onclick="addOption('storage')">+</button><button class="remove" onclick="deleteOption('storage')">−</button>
-</div></div>
+        <div>
+          <label>Model</label>
+          <div class="actions">
+            <select id="model"></select>
+            <button class="add" type="button" onclick="addOption('model')">+</button>
+            <button class="remove" type="button" onclick="deleteOption('model')">−</button>
+          </div>
+        </div>
 
-<div><label>Color</label><div class="actions">
-<select id="color"></select><button class="add" onclick="addOption('color')">+</button><button class="remove" onclick="deleteOption('color')">−</button>
-</div></div>
+        <div>
+          <label>Storage / GB</label>
+          <div class="actions">
+            <select id="storage"></select>
+            <button class="add" type="button" onclick="addOption('storage')">+</button>
+            <button class="remove" type="button" onclick="deleteOption('storage')">−</button>
+          </div>
+        </div>
 
-<div><label>Grade</label><div class="actions">
-<select id="grade"></select><button class="add" onclick="addOption('grade')">+</button><button class="remove" onclick="deleteOption('grade')">−</button>
-</div></div>
+        <div>
+          <label>Color</label>
+          <div class="actions">
+            <select id="color"></select>
+            <button class="add" type="button" onclick="addOption('color')">+</button>
+            <button class="remove" type="button" onclick="deleteOption('color')">−</button>
+          </div>
+        </div>
 
-<div><label>Produced Quantity</label><input type="number" id="productionQty" min="0"></div>
-<div><label>Export / Out Quantity</label><input type="number" id="exportQty" min="0" value="0"></div>
-</div>
+        <div>
+          <label>Grade</label>
+          <div class="actions">
+            <select id="grade"></select>
+            <button class="add" type="button" onclick="addOption('grade')">+</button>
+            <button class="remove" type="button" onclick="deleteOption('grade')">−</button>
+          </div>
+        </div>
 
-<div class="info"><strong>Calculated Day End Stock:</strong> <span id="preview">0</span> units</div>
-<button class="save" onclick="saveRecord()">Save Daily Production</button>
-</div>
+        <div>
+          <label>Produced Quantity</label>
+          <input type="number" id="productionQty" min="0" placeholder="Enter quantity">
+        </div>
 
-<div class="box">
-<h2>Daily Production Records</h2>
-<table>
-<thead><tr><th>Date</th><th>Model</th><th>GB</th><th>Color</th><th>Grade</th><th>Production</th><th>Export</th><th>Day End Stock</th><th>Delete</th></tr></thead>
-<tbody id="rows"></tbody>
-</table>
-</div>
-</main>
+        <div>
+          <label>Export / Out Quantity</label>
+          <input type="number" id="exportQty" min="0" value="0">
+        </div>
+      </div>
 
-<script>
-const db=window.supabase.createClient(
-'https://ohvplvdxflmgqoptwftk.supabase.co',
-'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH'
-);
+      <div class="info">
+        <strong>Calculated Day End Stock:</strong>
+        <span id="preview">0</span> units
+      </div>
 
-const pass='1213';
-let records=[];
-const defaults={
-model:['iPhone 13','Samsung S23'],
-storage:['-','64 GB','128 GB','256 GB'],
-color:['-','Black','White','Blue','Green'],
-grade:['A','B','Bulges A','Bulges B']
-};
+      <button class="save-btn" type="button" onclick="saveRecord()">
+        Save Daily Production
+      </button>
+    </div>
 
-const norm=v=>String(v||'').trim().replace(/\s+/g,' ').toLowerCase();
+    <div class="box">
+      <h2>Daily Production Records</h2>
 
-function loadOptions(id){
-  const saved=localStorage.getItem(id+'Options');
-  const list=saved?JSON.parse(saved):defaults[id];
-  const unique=[];
-  list.forEach(x=>{if(!unique.some(y=>norm(y)===norm(x)))unique.push(x.trim())});
-  localStorage.setItem(id+'Options',JSON.stringify(unique));
-  document.getElementById(id).innerHTML=unique.map(x=>`<option value="${x}">${x}</option>`).join('');
-}
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Model</th>
+            <th>GB</th>
+            <th>Color</th>
+            <th>Grade</th>
+            <th>Production</th>
+            <th>Export</th>
+            <th>Day End Stock</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
 
-function addOption(id){
-  const value=prompt('Enter new option:');
-  if(!value||!value.trim())return;
-  const list=JSON.parse(localStorage.getItem(id+'Options'))||[];
-  const existing=list.find(x=>norm(x)===norm(value));
-  if(existing){document.getElementById(id).value=existing;return}
-  list.push(value.trim());
-  localStorage.setItem(id+'Options',JSON.stringify(list));
-  loadOptions(id);
-  document.getElementById(id).value=value.trim();
-  previewStock();
-}
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </main>
 
-function deleteOption(id){
-  if(prompt('Enter delete password:')!==pass){alert('Incorrect password.');return}
-  const value=document.getElementById(id).value;
-  const list=(JSON.parse(localStorage.getItem(id+'Options'))||[]).filter(x=>norm(x)!==norm(value));
-  localStorage.setItem(id+'Options',JSON.stringify(list));
-  loadOptions(id);
-  previewStock();
-}
+  <script>
+    const db = window.supabase.createClient(
+      "https://ohvplvdxflmgqoptwftk.supabase.co",
+      "sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH"
+    );
 
-function previousStock(){
-  const list=records.filter(r=>
-    r.record_date<date.value &&
-    norm(r.model)===norm(model.value) &&
-    norm(r.storage)===norm(storage.value) &&
-    norm(r.color)===norm(color.value) &&
-    norm(r.grade)===norm(grade.value)
-  ).sort((a,b)=>b.record_date.localeCompare(a.record_date));
+    const deletePassword = "1213";
+    let records = [];
 
-  return list.length?Number(list[0].closing_stock)||0:0;
-}
+    const defaultOptions = {
+      model: ["iPhone 13", "Samsung S23"],
+      storage: ["-", "64 GB", "128 GB", "256 GB"],
+      color: ["-", "Black", "White", "Blue", "Green"],
+      grade: ["A", "B", "Bulges A", "Bulges B"]
+    };
 
-function previewStock(){
-  preview.textContent=previousStock()+(Number(productionQty.value)||0)-(Number(exportQty.value)||0);
-}
+    function normalize(value) {
+      return String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+    }
 
-async function loadRecords(){
-  const {data,error}=await db.from('production_records').select('*').order('record_date',{ascending:false});
-  if(error){alert(error.message);return}
-  records=data||[];
-  showRecords();
-  previewStock();
-}
+    async function syncOptionsFromLaptop() {
+      for (const category of Object.keys(defaultOptions)) {
+        const savedOptions = JSON.parse(
+          localStorage.getItem(category + "Options") || "[]"
+        );
 
-async function saveRecord(){
-  const p=Number(productionQty.value);
-  const e=Number(exportQty.value)||0;
+        const options = [...defaultOptions[category], ...savedOptions];
+        const unique = [];
 
-  if(!date.value||Number.isNaN(p)){alert('Please enter Date and Produced Quantity.');return}
+        options.forEach(function(value) {
+          if (!unique.some(item => normalize(item) === normalize(value))) {
+            unique.push(value.trim());
+          }
+        });
 
-  const old=records.find(r=>
-    r.record_date===date.value &&
-    norm(r.model)===norm(model.value) &&
-    norm(r.storage)===norm(storage.value) &&
-    norm(r.color)===norm(color.value) &&
-    norm(r.grade)===norm(grade.value)
-  );
+        const rows = unique.map(function(value) {
+          return {
+            category: category,
+            value: value,
+            normalized_value: normalize(value)
+          };
+        });
 
-  const opening=old?Number(old.opening_stock)||0:previousStock();
-  const totalP=(old?Number(old.production)||0:0)+p;
-  const totalE=(old?Number(old.export_qty)||0:0)+e;
-  const closing=opening+totalP-totalE;
+        await db
+          .from("production_options")
+          .upsert(rows, {
+            onConflict: "category,normalized_value",
+            ignoreDuplicates: true
+          });
+      }
+    }
 
-  if(closing<0){alert('Export quantity is more than available stock.');return}
+    async function loadOptions(category) {
+      const { data, error } = await db
+        .from("production_options")
+        .select("id, value")
+        .eq("category", category)
+        .order("value");
 
-  const data={
-    record_date:date.value,model:model.value,storage:storage.value,
-    color:color.value,grade:grade.value,production:totalP,
-    export_qty:totalE,opening_stock:opening,closing_stock:closing
-  };
+      if (error) {
+        alert(error.message);
+        return;
+      }
 
-  const result=old
-    ?await db.from('production_records').update(data).eq('id',old.id)
-    :await db.from('production_records').insert(data);
+      const select = document.getElementById(category);
+      select.innerHTML = "";
 
-  if(result.error){alert(result.error.message);return}
+      (data || []).forEach(function(item) {
+        select.innerHTML += `<option value="${item.value}">${item.value}</option>`;
+      });
+    }
 
-  productionQty.value='';
-  exportQty.value='0';
-  await loadRecords();
-}
+    async function addOption(category) {
+      const value = prompt("Enter new option:");
 
-function showRecords(){
-  rows.innerHTML=records.map(r=>`
-  <tr>
-    <td>${r.record_date}</td><td>${r.model}</td><td>${r.storage}</td>
-    <td>${r.color}</td><td>${r.grade}</td><td>${r.production}</td>
-    <td>${r.export_qty}</td><td><strong>${r.closing_stock}</strong></td>
-    <td><button class="delete" onclick="deleteRecord('${r.id}')">Delete</button></td>
-  </tr>`).join('');
-}
+      if (!value || value.trim() === "") {
+        return;
+      }
 
-async function deleteRecord(id){
-  if(prompt('Enter delete password:')!==pass){alert('Incorrect password.');return}
-  if(!confirm('Delete this production record?'))return;
-  const {error}=await db.from('production_records').delete().eq('id',id);
-  if(error){alert(error.message);return}
-  await loadRecords();
-}
+      const { error } = await db
+        .from("production_options")
+        .insert({
+          category: category,
+          value: value.trim(),
+          normalized_value: normalize(value)
+        });
 
-date.valueAsDate=new Date();
-['model','storage','color','grade'].forEach(id=>{
-  loadOptions(id);
-  document.getElementById(id).addEventListener('change',previewStock);
-});
-date.addEventListener('change',previewStock);
-productionQty.addEventListener('input',previewStock);
-exportQty.addEventListener('input',previewStock);
-loadRecords();
-</script>
+      if (error && !error.message.includes("duplicate")) {
+        alert(error.message);
+        return;
+      }
+
+      await loadOptions(category);
+      document.getElementById(category).value = value.trim();
+      updateStockPreview();
+    }
+
+    async function deleteOption(category) {
+      const password = prompt("Enter delete password:");
+
+      if (password !== deletePassword) {
+        alert("Incorrect password.");
+        return;
+      }
+
+      const value = document.getElementById(category).value;
+
+      if (!confirm(`Delete "${value}" from the list?`)) {
+        return;
+      }
+
+      const { error } = await db
+        .from("production_options")
+        .delete()
+        .eq("category", category)
+        .eq("normalized_value", normalize(value));
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await loadOptions(category);
+      updateStockPreview();
+    }
+
+    async function loadRecords() {
+      const { data, error } = await db
+        .from("production_records")
+        .select("*")
+        .order("record_date", { ascending: false });
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      records = data || [];
+      showRecords();
+      updateStockPreview();
+    }
+
+    function getPreviousStock() {
+      const date = document.getElementById("date").value;
+      const model = document.getElementById("model").value;
+      const storage = document.getElementById("storage").value;
+      const color = document.getElementById("color").value;
+      const grade = document.getElementById("grade").value;
+
+      const previousRecords = records.filter(function(record) {
+        return record.record_date < date &&
+          normalize(record.model) === normalize(model) &&
+          normalize(record.storage) === normalize(storage) &&
+          normalize(record.color) === normalize(color) &&
+          normalize(record.grade) === normalize(grade);
+      });
+
+      previousRecords.sort(function(a, b) {
+        return b.record_date.localeCompare(a.record_date);
+      });
+
+      return previousRecords.length
+        ? Number(previousRecords[0].closing_stock) || 0
+        : 0;
+    }
+
+    function updateStockPreview() {
+      const production = Number(
+        document.getElementById("productionQty").value
+      ) || 0;
+
+      const exportQty = Number(
+        document.getElementById("exportQty").value
+      ) || 0;
+
+      document.getElementById("preview").textContent =
+        getPreviousStock() + production - exportQty;
+    }
+
+    async function saveRecord() {
+      const date = document.getElementById("date").value;
+      const model = document.getElementById("model").value;
+      const storage = document.getElementById("storage").value;
+      const color = document.getElementById("color").value;
+      const grade = document.getElementById("grade").value;
+      const production = Number(document.getElementById("productionQty").value);
+      const exportQty = Number(document.getElementById("exportQty").value) || 0;
+
+      if (!date || Number.isNaN(production)) {
+        alert("Please enter Date and Produced Quantity.");
+        return;
+      }
+
+      const oldRecord = records.find(function(record) {
+        return record.record_date === date &&
+          normalize(record.model) === normalize(model) &&
+          normalize(record.storage) === normalize(storage) &&
+          normalize(record.color) === normalize(color) &&
+          normalize(record.grade) === normalize(grade);
+      });
+
+      const openingStock = oldRecord
+        ? Number(oldRecord.opening_stock) || 0
+        : getPreviousStock();
+
+      const totalProduction =
+        (oldRecord ? Number(oldRecord.production) || 0 : 0) + production;
+
+      const totalExport =
+        (oldRecord ? Number(oldRecord.export_qty) || 0 : 0) + exportQty;
+
+      const closingStock = openingStock + totalProduction - totalExport;
+
+      if (closingStock < 0) {
+        alert("Export quantity is more than available stock.");
+        return;
+      }
+
+      const payload = {
+        record_date: date,
+        model: model,
+        storage: storage,
+        color: color,
+        grade: grade,
+        production: totalProduction,
+        export_qty: totalExport,
+        opening_stock: openingStock,
+        closing_stock: closingStock
+      };
+
+      const result = oldRecord
+        ? await db.from("production_records").update(payload).eq("id", oldRecord.id)
+        : await db.from("production_records").insert(payload);
+
+      if (result.error) {
+        alert(result.error.message);
+        return;
+      }
+
+      document.getElementById("productionQty").value = "";
+      document.getElementById("exportQty").value = "0";
+
+      await loadRecords();
+    }
+
+    function showRecords() {
+      const table = document.getElementById("rows");
+
+      table.innerHTML = records.map(function(record) {
+        return `
+          <tr>
+            <td>${record.record_date}</td>
+            <td>${record.model}</td>
+            <td>${record.storage}</td>
+            <td>${record.color}</td>
+            <td>${record.grade}</td>
+            <td>${record.production}</td>
+            <td>${record.export_qty}</td>
+            <td><strong>${record.closing_stock}</strong></td>
+            <td>
+              <button class="delete-btn" onclick="deleteRecord('${record.id}')">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function deleteRecord(id) {
+      const password = prompt("Enter delete password:");
+
+      if (password !== deletePassword) {
+        alert("Incorrect password.");
+        return;
+      }
+
+      if (!confirm("Delete this production record?")) {
+        return;
+      }
+
+      const { error } = await db
+        .from("production_records")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await loadRecords();
+    }
+
+    async function initializeApp() {
+      document.getElementById("date").valueAsDate = new Date();
+
+      await syncOptionsFromLaptop();
+
+      for (const category of Object.keys(defaultOptions)) {
+        await loadOptions(category);
+
+        document
+          .getElementById(category)
+          .addEventListener("change", updateStockPreview);
+      }
+
+      document
+        .getElementById("date")
+        .addEventListener("change", updateStockPreview);
+
+      document
+        .getElementById("productionQty")
+        .addEventListener("input", updateStockPreview);
+
+      document
+        .getElementById("exportQty")
+        .addEventListener("input", updateStockPreview);
+
+      await loadRecords();
+    }
+
+    initializeApp();
+  </script>
 </body>
 </html>
