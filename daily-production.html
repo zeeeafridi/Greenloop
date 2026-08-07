@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daily Production | Greenloop FZC</title>
-
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
     body { margin: 0; background: #f3f7f4; color: #163d2d; }
@@ -17,17 +16,16 @@
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; }
     label { display: block; margin-bottom: 7px; font-weight: bold; font-size: 14px; }
     input, select { width: 100%; padding: 12px; border: 1px solid #cfd8d2; border-radius: 8px; font-size: 15px; }
-    .select-actions { display: flex; gap: 6px; }
-    .select-actions select { flex: 1; }
-    .add-btn, .remove-btn { padding: 0 12px; border: none; border-radius: 8px; color: white; font-size: 20px; font-weight: bold; cursor: pointer; }
-    .add-btn { background: #0b5b38; }
-    .remove-btn { background: #d84343; }
-    .save-btn { margin-top: 24px; padding: 13px 28px; border: none; border-radius: 8px; background: #168653; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .actions { display: flex; gap: 6px; }
+    .actions select { flex: 1; }
+    button { border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; }
+    .add { padding: 0 12px; background: #0b5b38; font-size: 20px; }
+    .remove, .delete-btn { padding: 7px 10px; background: #d84343; }
+    .save { margin-top: 24px; padding: 13px 28px; background: #168653; font-size: 16px; }
     .info { margin-top: 20px; padding: 16px; border-radius: 8px; background: #e7f5ec; }
     table { width: 100%; border-collapse: collapse; margin-top: 16px; }
     th, td { padding: 11px; border-bottom: 1px solid #e2e7e4; text-align: center; }
     th { background: #0b5b38; color: white; }
-    .delete-btn { padding: 7px 10px; border: none; border-radius: 6px; background: #d84343; color: white; cursor: pointer; }
   </style>
 </head>
 
@@ -56,37 +54,37 @@
 
         <div>
           <label>Model</label>
-          <div class="select-actions">
+          <div class="actions">
             <select id="model"></select>
-            <button class="add-btn" type="button" onclick="addOption('model')">+</button>
-            <button class="remove-btn" type="button" onclick="deleteOption('model')">−</button>
+            <button class="add" onclick="addOption('model')">+</button>
+            <button class="remove" onclick="deleteOption('model')">−</button>
           </div>
         </div>
 
         <div>
           <label>Storage / GB</label>
-          <div class="select-actions">
+          <div class="actions">
             <select id="storage"></select>
-            <button class="add-btn" type="button" onclick="addOption('storage')">+</button>
-            <button class="remove-btn" type="button" onclick="deleteOption('storage')">−</button>
+            <button class="add" onclick="addOption('storage')">+</button>
+            <button class="remove" onclick="deleteOption('storage')">−</button>
           </div>
         </div>
 
         <div>
           <label>Color</label>
-          <div class="select-actions">
+          <div class="actions">
             <select id="color"></select>
-            <button class="add-btn" type="button" onclick="addOption('color')">+</button>
-            <button class="remove-btn" type="button" onclick="deleteOption('color')">−</button>
+            <button class="add" onclick="addOption('color')">+</button>
+            <button class="remove" onclick="deleteOption('color')">−</button>
           </div>
         </div>
 
         <div>
           <label>Grade</label>
-          <div class="select-actions">
+          <div class="actions">
             <select id="grade"></select>
-            <button class="add-btn" type="button" onclick="addOption('grade')">+</button>
-            <button class="remove-btn" type="button" onclick="deleteOption('grade')">−</button>
+            <button class="add" onclick="addOption('grade')">+</button>
+            <button class="remove" onclick="deleteOption('grade')">−</button>
           </div>
         </div>
 
@@ -106,24 +104,17 @@
         <span id="stockPreview">0</span> units
       </div>
 
-      <button class="save-btn" type="button" onclick="saveRecord()">Save Daily Production</button>
+      <button class="save" onclick="saveRecord()">Save Daily Production</button>
     </div>
 
     <div class="box">
       <h2>Daily Production Records</h2>
-
       <table>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Model</th>
-            <th>GB</th>
-            <th>Color</th>
-            <th>Grade</th>
-            <th>Production</th>
-            <th>Export</th>
-            <th>Day End Stock</th>
-            <th>Delete</th>
+            <th>Date</th><th>Model</th><th>GB</th><th>Color</th>
+            <th>Grade</th><th>Production</th><th>Export</th>
+            <th>Day End Stock</th><th>Delete</th>
           </tr>
         </thead>
         <tbody id="records"></tbody>
@@ -150,41 +141,38 @@
     }
 
     function loadOptions(id) {
-      let options = JSON.parse(localStorage.getItem(id + "Options")) || defaultOptions[id];
-      const uniqueOptions = [];
-      const usedValues = [];
+      const savedOptions = localStorage.getItem(id + "Options");
+      const options = savedOptions ? JSON.parse(savedOptions) : [...defaultOptions[id]];
+      const unique = [];
+      const used = [];
 
-      options.concat(defaultOptions[id]).forEach(function(item) {
-        const normalized = normalize(item);
-
-        if (!usedValues.includes(normalized)) {
-          usedValues.push(normalized);
-          uniqueOptions.push(item.trim());
+      options.forEach(function(item) {
+        const value = normalize(item);
+        if (!used.includes(value)) {
+          used.push(value);
+          unique.push(item.trim());
         }
       });
 
-      localStorage.setItem(id + "Options", JSON.stringify(uniqueOptions));
+      localStorage.setItem(id + "Options", JSON.stringify(unique));
 
       const select = document.getElementById(id);
       select.innerHTML = "";
 
-      uniqueOptions.forEach(function(item) {
+      unique.forEach(function(item) {
         select.innerHTML += `<option value="${item}">${item}</option>`;
       });
     }
 
     function addOption(id) {
       const value = prompt("Enter new option:");
-
       if (!value || value.trim() === "") return;
 
-      const options = JSON.parse(localStorage.getItem(id + "Options")) || defaultOptions[id];
-      const existingOption = options.find(function(item) {
-        return normalize(item) === normalize(value);
-      });
+      const options = JSON.parse(localStorage.getItem(id + "Options")) || [];
+      const existing = options.find(item => normalize(item) === normalize(value));
 
-      if (existingOption) {
-        document.getElementById(id).value = existingOption;
+      if (existing) {
+        document.getElementById(id).value = existing;
         alert("This option already exists.");
         return;
       }
@@ -198,32 +186,20 @@
 
     function deleteOption(id) {
       const password = prompt("Enter delete password:");
-
       if (password !== deletePassword) {
         alert("Incorrect password.");
         return;
       }
 
-      const selectedValue = document.getElementById(id).value;
-      const options = JSON.parse(localStorage.getItem(id + "Options")) || defaultOptions[id];
+      const value = document.getElementById(id).value;
+      if (!confirm(`Delete "${value}" from the list?`)) return;
 
-      if (!confirm(`Delete "${selectedValue}" from the list?`)) return;
+      const options = JSON.parse(localStorage.getItem(id + "Options")) || [];
+      const updated = options.filter(item => normalize(item) !== normalize(value));
 
-      const updatedOptions = options.filter(function(item) {
-        return normalize(item) !== normalize(selectedValue);
-      });
-
-      localStorage.setItem(id + "Options", JSON.stringify(updatedOptions));
+      localStorage.setItem(id + "Options", JSON.stringify(updated));
       loadOptions(id);
       updateStockPreview();
-    }
-
-    function isSameItem(record, date, model, storage, color, grade) {
-      return record.date === date &&
-        normalize(record.model) === normalize(model) &&
-        normalize(record.storage) === normalize(storage) &&
-        normalize(record.color) === normalize(color) &&
-        normalize(record.grade) === normalize(grade);
     }
 
     function getPreviousStock() {
@@ -233,29 +209,23 @@
       const color = document.getElementById("color").value;
       const grade = document.getElementById("grade").value;
 
-      const previousRecords = getRecords().filter(function(record) {
-        return record.date < date &&
-          normalize(record.model) === normalize(model) &&
-          normalize(record.storage) === normalize(storage) &&
-          normalize(record.color) === normalize(color) &&
-          normalize(record.grade) === normalize(grade);
-      });
+      const list = getRecords().filter(record =>
+        record.date < date &&
+        normalize(record.model) === normalize(model) &&
+        normalize(record.storage) === normalize(storage) &&
+        normalize(record.color) === normalize(color) &&
+        normalize(record.grade) === normalize(grade)
+      );
 
-      previousRecords.sort(function(a, b) {
-        return b.date.localeCompare(a.date);
-      });
-
-      return previousRecords.length > 0
-        ? Number(previousRecords[0].closingStock) || 0
-        : 0;
+      list.sort((a, b) => b.date.localeCompare(a.date));
+      return list.length ? Number(list[0].closingStock) || 0 : 0;
     }
 
     function updateStockPreview() {
       const production = Number(document.getElementById("productionQty").value) || 0;
       const exportQty = Number(document.getElementById("exportQty").value) || 0;
-      const stock = getPreviousStock() + production - exportQty;
-
-      document.getElementById("stockPreview").textContent = stock;
+      document.getElementById("stockPreview").textContent =
+        getPreviousStock() + production - exportQty;
     }
 
     function saveRecord() {
@@ -275,26 +245,24 @@
       const records = getRecords();
       const previousStock = getPreviousStock();
 
-      const existingIndex = records.findIndex(function(record) {
-        return isSameItem(record, date, model, storage, color, grade);
-      });
+      const index = records.findIndex(record =>
+        record.date === date &&
+        normalize(record.model) === normalize(model) &&
+        normalize(record.storage) === normalize(storage) &&
+        normalize(record.color) === normalize(color) &&
+        normalize(record.grade) === normalize(grade)
+      );
 
-      if (existingIndex >= 0) {
-        const oldRecord = records[existingIndex];
-        const totalProduction = (Number(oldRecord.production) || 0) + production;
-        const totalExport = (Number(oldRecord.exportQty) || 0) + exportQty;
-        const openingStock = Number(oldRecord.openingStock) || previousStock;
+      if (index >= 0) {
+        const old = records[index];
+        const totalProduction = (Number(old.production) || 0) + production;
+        const totalExport = (Number(old.exportQty) || 0) + exportQty;
 
-        records[existingIndex] = {
-          ...oldRecord,
-          model: oldRecord.model,
-          storage: oldRecord.storage,
-          color: oldRecord.color,
-          grade: oldRecord.grade,
+        records[index] = {
+          ...old,
           production: totalProduction,
           exportQty: totalExport,
-          openingStock: openingStock,
-          closingStock: openingStock + totalProduction - totalExport
+          closingStock: (Number(old.openingStock) || previousStock) + totalProduction - totalExport
         };
       } else {
         const closingStock = previousStock + production - exportQty;
@@ -305,35 +273,24 @@
         }
 
         records.push({
-          date: date,
-          model: model,
-          storage: storage,
-          color: color,
-          grade: grade,
-          production: production,
-          exportQty: exportQty,
+          date, model, storage, color, grade,
+          production,
+          exportQty,
           openingStock: previousStock,
-          closingStock: closingStock
+          closingStock
         });
       }
 
       localStorage.setItem("productionRecords", JSON.stringify(records));
-
       document.getElementById("productionQty").value = "";
       document.getElementById("exportQty").value = "0";
-
       showRecords();
       updateStockPreview();
     }
 
     function showRecords() {
       const table = document.getElementById("records");
-      const records = getRecords();
-
-      records.sort(function(a, b) {
-        return b.date.localeCompare(a.date);
-      });
-
+      const records = getRecords().sort((a, b) => b.date.localeCompare(a.date));
       table.innerHTML = "";
 
       records.forEach(function(record, index) {
@@ -355,7 +312,6 @@
 
     function deleteRecord(index) {
       const password = prompt("Enter delete password:");
-
       if (password !== deletePassword) {
         alert("Incorrect password.");
         return;
@@ -363,15 +319,9 @@
 
       if (!confirm("Delete this production record?")) return;
 
-      const records = getRecords();
-
-      records.sort(function(a, b) {
-        return b.date.localeCompare(a.date);
-      });
-
+      const records = getRecords().sort((a, b) => b.date.localeCompare(a.date));
       records.splice(index, 1);
       localStorage.setItem("productionRecords", JSON.stringify(records));
-
       showRecords();
       updateStockPreview();
     }
