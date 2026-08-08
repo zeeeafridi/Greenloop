@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Production Reports | Greenloop FZC</title>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -76,6 +77,7 @@
             <th>Total Stock</th>
           </tr>
         </thead>
+
         <tbody id="mainRows"></tbody>
         <tfoot id="mainTotals"></tfoot>
       </table>
@@ -95,6 +97,7 @@
             <th>Total Bulges</th>
           </tr>
         </thead>
+
         <tbody id="bulgesRows"></tbody>
         <tfoot id="bulgesTotals"></tfoot>
       </table>
@@ -108,12 +111,14 @@
           <tr>
             <th>Date</th>
             <th>Today's Production</th>
+            <th>Total Production</th>
             <th>Today's Export</th>
-            <th>Balance</th>
+            <th>Average Production</th>
+            <th>Stock Balance</th>
           </tr>
         </thead>
+
         <tbody id="dailyRows"></tbody>
-        <tfoot id="dailyTotals"></tfoot>
       </table>
     </div>
   </main>
@@ -133,15 +138,56 @@
       if (!value) return null;
 
       const parts = value.split("/");
+
       if (parts.length !== 3) return null;
 
-      return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+      const day = parts[0].padStart(2, "0");
+      const month = parts[1].padStart(2, "0");
+      const year = parts[2];
+
+      if (day.length !== 2 || month.length !== 2 || year.length !== 4) {
+        return null;
+      }
+
+      return `${year}-${month}-${day}`;
     }
 
     function todayDate() {
       const today = new Date();
 
       return `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
+    }
+
+    function isBulges(record) {
+      return record.grade === "Bulges A" || record.grade === "Bulges B";
+    }
+
+    function getBalanceOnDate(records, date) {
+      const latestByItem = {};
+
+      records
+        .filter(function(record) {
+          return record.record_date <= date && !isBulges(record);
+        })
+        .forEach(function(record) {
+          const key = [
+            record.model,
+            record.storage,
+            record.color,
+            record.grade
+          ].join("|").toLowerCase();
+
+          if (
+            !latestByItem[key] ||
+            latestByItem[key].record_date <= record.record_date
+          ) {
+            latestByItem[key] = record;
+          }
+        });
+
+      return Object.values(latestByItem).reduce(function(total, record) {
+        return total + (Number(record.closing_stock) || 0);
+      }, 0);
     }
 
     async function showReport() {
@@ -168,61 +214,64 @@
 
       const allRecords = data || [];
 
-      const filteredRecords = allRecords.filter(function(record) {
-        return record.record_date >= fromDate &&
-          record.record_date <= toDate;
+      const nonBulgesRecords = allRecords.filter(function(record) {
+        return !isBulges(record);
       });
 
-      const dailySummary = {};
+      const dailyData = {};
 
-      filteredRecords.forEach(function(record) {
-        if (record.grade === "Bulges A" || record.grade === "Bulges B") {
-          return;
-        }
-
-        if (!dailySummary[record.record_date]) {
-          dailySummary[record.record_date] = {
+      nonBulgesRecords.forEach(function(record) {
+        if (!dailyData[record.record_date]) {
+          dailyData[record.record_date] = {
             date: record.record_date,
             production: 0,
-            exportQty: 0,
-            balance: 0
+            exportQty: 0
           };
         }
 
-        dailySummary[record.record_date].production += Number(record.production) || 0;
-        dailySummary[record.record_date].exportQty += Number(record.export_qty) || 0;
-        dailySummary[record.record_date].balance += Number(record.closing_stock) || 0;
+        dailyData[record.record_date].production += Number(record.production) || 0;
+        dailyData[record.record_date].exportQty += Number(record.export_qty) || 0;
       });
 
-      let totalProduction = 0;
-      let totalExport = 0;
+      const allDates = Object.keys(dailyData).sort();
 
-      document.getElementById("dailyRows").innerHTML = Object.values(dailySummary)
+      let accumulatedProduction = 0;
+      let productionDays = 0;
+
+      const dateReport = [];
+
+      allDates.forEach(function(date) {
+        accumulatedProduction += dailyData[date].production;
+        productionDays += 1;
+
+        if (date >= fromDate && date <= toDate) {
+          dateReport.push({
+            date: date,
+            todayProduction: dailyData[date].production,
+            totalProduction: accumulatedProduction,
+            todayExport: dailyData[date].exportQty,
+            averageProduction: accumulatedProduction / productionDays,
+            balance: getBalanceOnDate(allRecords, date)
+          });
+        }
+      });
+
+      document.getElementById("dailyRows").innerHTML = dateReport
         .sort(function(a, b) {
           return b.date.localeCompare(a.date);
         })
         .map(function(item) {
-          totalProduction += item.production;
-          totalExport += item.exportQty;
-
           return `
             <tr>
               <td>${formatDate(item.date)}</td>
-              <td>${item.production}</td>
-              <td>${item.exportQty}</td>
+              <td>${item.todayProduction}</td>
+              <td>${item.totalProduction}</td>
+              <td>${item.todayExport}</td>
+              <td>${item.averageProduction.toFixed(2)}</td>
               <td><strong>${item.balance}</strong></td>
             </tr>
           `;
         }).join("");
-
-      document.getElementById("dailyTotals").innerHTML = `
-        <tr>
-          <td>Grand Total</td>
-          <td>${totalProduction}</td>
-          <td>${totalExport}</td>
-          <td></td>
-        </tr>
-      `;
 
       const latestRecords = {};
 
@@ -238,7 +287,10 @@
             record.grade
           ].join("|").toLowerCase();
 
-          if (!latestRecords[key] || latestRecords[key].record_date <= record.record_date) {
+          if (
+            !latestRecords[key] ||
+            latestRecords[key].record_date <= record.record_date
+          ) {
             latestRecords[key] = record;
           }
         });
