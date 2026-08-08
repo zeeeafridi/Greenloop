@@ -7,39 +7,32 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { margin: 0; background: #f3f7f4; color: #123c2b; }
-    header { display: flex; align-items: center; gap: 12px; padding: 14px 8%; background: #0b5b38; color: white; font-size: 22px; font-weight: bold; }
-    .header-logo { width: 55px; height: 42px; object-fit: contain; }
-    .top-nav { padding: 14px 8%; display: flex; gap: 12px; flex-wrap: wrap; background: #e5f3ea; }
-    .top-nav a { padding: 10px 16px; color: #0b5b38; background: white; border-radius: 7px; text-decoration: none; font-weight: bold; }
-    main { max-width: 1200px; margin: auto; padding: 35px 20px; }
-    h1 { margin-bottom: 8px; }
-    .subtitle { margin-top: 0; color: #526c5e; }
-    .box { margin-top: 24px; padding: 25px; border-radius: 14px; background: white; box-shadow: 0 4px 18px rgba(0,0,0,.08); }
-    .scan-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .scan-row input { flex: 1; min-width: 240px; }
-    input { padding: 13px; border: 2px solid #168653; border-radius: 8px; font-size: 18px; font-weight: bold; }
-    button { border: 0; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; }
-    .find-btn { padding: 13px 22px; background: #0b5b38; font-size: 15px; }
-    .save-btn { margin-top: 20px; padding: 13px 28px; background: #168653; font-size: 16px; }
-    .delete-btn { padding: 8px 11px; background: #d84343; }
-    .details { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin-top: 22px; }
-    .detail { padding: 14px; border-radius: 8px; background: #e7f5ec; }
-    .detail small { display: block; color: #526c5e; margin-bottom: 5px; }
-    .detail strong { font-size: 16px; word-break: break-word; }
-    #status { margin-top: 14px; min-height: 20px; font-weight: bold; }
-    .success { color: #0b6e42; }
-    .error { color: #c43838; }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; min-width: 1000px; }
-    th, td { padding: 11px; border-bottom: 1px solid #e2e7e4; text-align: center; }
-    th { background: #0b5b38; color: white; }
-
-    @media (max-width: 650px) {
-      main { padding: 28px 14px; }
-      .box { padding: 18px; }
-    }
+    *{box-sizing:border-box;font-family:Arial,sans-serif}
+    body{margin:0;background:#f3f7f4;color:#123c2b}
+    header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}
+    .header-logo{width:55px;height:42px;object-fit:contain}
+    .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}
+    .top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
+    main{max-width:1200px;margin:auto;padding:35px 20px}
+    .box{margin-top:24px;padding:25px;border-radius:14px;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.08)}
+    .scan-row{display:flex;gap:12px;flex-wrap:wrap}
+    .scan-row input{flex:1;min-width:240px}
+    input{padding:13px;border:2px solid #168653;border-radius:8px;font-size:18px;font-weight:bold}
+    button{border:0;border-radius:8px;color:#fff;cursor:pointer;font-weight:bold}
+    .find-btn{padding:13px 22px;background:#0b5b38;font-size:15px}
+    .save-btn{margin-top:20px;padding:13px 28px;background:#168653;font-size:16px}
+    .delete-btn{padding:8px 11px;background:#d84343}
+    .details{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px;margin-top:22px}
+    .detail{padding:14px;border-radius:8px;background:#e7f5ec}
+    .detail small{display:block;color:#526c5e;margin-bottom:5px}
+    .detail strong{font-size:16px;word-break:break-word}
+    #status{margin-top:14px;min-height:20px;font-weight:bold}
+    .success{color:#0b6e42}.error{color:#c43838}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;margin-top:16px;min-width:1000px}
+    th,td{padding:11px;border-bottom:1px solid #e2e7e4;text-align:center}
+    th{background:#0b5b38;color:#fff}
+    @media(max-width:650px){main{padding:28px 14px}.box{padding:18px}}
   </style>
 </head>
 
@@ -50,24 +43,21 @@
   </header>
 
   <nav class="top-nav">
+    <a href="javascript:history.back()">Back</a>
     <a href="dashboard.html">Dashboard</a>
     <a href="quality-control.html">Quality Control</a>
     <a href="stock-in.html">Stock In</a>
+    <a href="index.html">Home / Login</a>
+    <a href="#" onclick="logout();return false;">Logout</a>
   </nav>
 
   <main>
     <h1>Stock Out</h1>
-    <p class="subtitle">Scan the IMEI to find the Stock In record automatically.</p>
+    <p>Scan the IMEI to find the Stock In record automatically.</p>
 
     <div class="box">
       <div class="scan-row">
-        <input
-          type="text"
-          id="scanImei"
-          placeholder="Click here and scan IMEI"
-          inputmode="numeric"
-          autocomplete="off"
-        >
+        <input type="text" id="scanImei" placeholder="Click here and scan IMEI" inputmode="numeric" autocomplete="off">
         <button class="find-btn" onclick="findImei()">Find IMEI</button>
       </div>
 
@@ -115,10 +105,16 @@
   <script>
     const db = window.supabase.createClient(
       'https://ohvplvdxflmgqoptwftk.supabase.co',
-      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH'
+      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH',
+      {
+        auth: {
+          experimental: {
+            passkey: true
+          }
+        }
+      }
     );
 
-    const deletePassword = '1213';
     let selectedStockIn = null;
 
     function setStatus(message, type = '') {
@@ -229,6 +225,7 @@
 
       document.getElementById('scanImei').value = '';
       clearDetails();
+
       await loadRecords();
 
       document.getElementById('scanImei').focus();
@@ -236,7 +233,9 @@
 
     function formatDate(value) {
       if (!value) return '';
+
       const parts = value.split('-');
+
       return parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : value;
     }
 
@@ -270,13 +269,51 @@
         .join('');
     }
 
-    async function deleteRecord(id) {
-      if (prompt('Enter delete password:') !== deletePassword) {
-        setStatus('Incorrect password.', 'error');
-        return;
+    async function verifyDeleteAccess() {
+      const { data: userData } = await db.auth.getUser();
+      const user = userData.user;
+
+      if (!user) {
+        setStatus('Please log in again.', 'error');
+        return false;
       }
 
+      const { data: passkeys, error: passkeyError } = await db.auth.passkey.list();
+
+      if (!passkeyError && (!passkeys || !passkeys.length)) {
+        setStatus('Set up Windows Hello Face or PIN.');
+
+        const { error } = await db.auth.registerPasskey();
+
+        if (!error) return true;
+      }
+
+      if (!passkeyError && passkeys && passkeys.length) {
+        const { error } = await db.auth.signInWithPasskey();
+
+        if (!error) return true;
+      }
+
+      const password = prompt('Face verification unavailable. Enter your account password:');
+
+      if (!password) return false;
+
+      const { error } = await db.auth.signInWithPassword({
+        email: user.email,
+        password: password
+      });
+
+      if (error) {
+        setStatus('Incorrect account password.', 'error');
+        return false;
+      }
+
+      return true;
+    }
+
+    async function deleteRecord(id) {
       if (!confirm('Delete this Stock Out record?')) return;
+      if (!await verifyDeleteAccess()) return;
 
       const { error } = await db
         .from('quality_stock_out')
@@ -291,6 +328,17 @@
       setStatus('Record deleted. This IMEI can be scanned again.', 'success');
       await loadRecords();
     }
+
+    async function logout() {
+      await db.auth.signOut();
+      window.location.href = 'index.html';
+    }
+
+    db.auth.getSession().then(result => {
+      if (!result.data.session) {
+        window.location.href = 'index.html';
+      }
+    });
 
     document.getElementById('scanImei').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
