@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QC Reports | Greenloop FZC</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    *{box-sizing:border-box;font-family:Arial,sans-serif}
+    body{margin:0;background:#f3f7f4;color:#123c2b}
+    header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}
+    .header-logo{width:55px;height:42px;object-fit:contain}
+    .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}
+    .top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
+    main{max-width:1500px;margin:auto;padding:35px 20px}
+    .box{margin-top:24px;padding:25px;border-radius:14px;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.08);overflow-x:auto}
+    .filters{display:flex;gap:15px;align-items:end;flex-wrap:wrap}
+    label{display:block;margin-bottom:7px;font-weight:bold}
+    input{padding:11px;border:1px solid #cfd8d2;border-radius:8px;font-size:15px}
+    button{padding:12px 20px;border:0;border-radius:8px;background:#168653;color:#fff;font-weight:bold;cursor:pointer}
+    .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
+    .summary-card{padding:18px;border-radius:12px;background:#e7f5ec;border-left:5px solid #168653}
+    .summary-card small{display:block;color:#526c5e;margin-bottom:7px}.summary-card strong{font-size:28px;color:#0b5b38}
+    table{width:100%;border-collapse:collapse;margin-top:15px;min-width:1700px}
+    th,td{padding:11px;border-bottom:1px solid #e2e7e4;text-align:center;vertical-align:top}
+    th{background:#0b5b38;color:#fff;white-space:nowrap}
+    .status{font-weight:bold;padding:6px 10px;border-radius:15px;display:inline-block;white-space:nowrap}
+    .stock-in{background:#e7f5ec;color:#0b6e42}.lab{background:#fff4dc;color:#8a5c00}.fixed{background:#dff1ff;color:#075d93}.rework{background:#ffe5e5;color:#b52d2d}.stock-out{background:#e8e8e8;color:#4a4a4a}
+    #message{margin-top:12px;font-weight:bold}
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">
+    Greenloop FZC
+  </header>
+
+  <nav class="top-nav">
+    <a href="javascript:history.back()">Back</a>
+    <a href="quality-control.html">Quality Control</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="index.html">Home / Login</a>
+    <a href="#" onclick="logout();return false;">Logout</a>
+  </nav>
+
+  <main>
+    <h1>Quality Control Reports</h1>
+
+    <div class="box">
+      <div class="filters">
+        <div>
+          <label>From Date</label>
+          <input type="date" id="fromDate">
+        </div>
+
+        <div>
+          <label>To Date</label>
+          <input type="date" id="toDate">
+        </div>
+
+        <button onclick="loadReport()">Show Report</button>
+      </div>
+
+      <div id="message"></div>
+    </div>
+
+    <div class="box">
+      <div class="summary">
+        <div class="summary-card"><small>Total Inventory Entry</small><strong id="totalStockIn">0</strong></div>
+        <div class="summary-card"><small>Sent to Lab</small><strong id="totalLab">0</strong></div>
+        <div class="summary-card"><small>Fixed</small><strong id="totalFixed">0</strong></div>
+        <div class="summary-card"><small>Rework</small><strong id="totalRework">0</strong></div>
+        <div class="summary-card"><small>Stock Out</small><strong id="totalStockOut">0</strong></div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>QC Complete Report</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Inventory Date</th>
+            <th>Model</th>
+            <th>GB</th>
+            <th>Color</th>
+            <th>IMEI</th>
+            <th>Supplier Grade</th>
+            <th>Our Grade</th>
+            <th>Repair Diagnosis</th>
+            <th>Parts</th>
+            <th>Technician</th>
+            <th>Work Done</th>
+            <th>Time</th>
+            <th>Lab Result</th>
+            <th>Stock Out Date</th>
+            <th>Current Status</th>
+          </tr>
+        </thead>
+
+        <tbody id="reportRows"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const db = window.supabase.createClient(
+      'https://ohvplvdxflmgqoptwftk.supabase.co',
+      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH'
+    );
+
+    function formatDate(value) {
+      if (!value) return '-';
+
+      const parts = String(value).split('-');
+
+      return parts.length === 3
+        ? `${parts[2]}-${parts[1]}-${parts[0]}`
+        : value;
+    }
+
+    function setMessage(message, error = false) {
+      const element = document.getElementById('message');
+      element.textContent = message;
+      element.style.color = error ? '#c43838' : '#0b6e42';
+    }
+
+    function latestByDate(records) {
+      if (!records || !records.length) return null;
+
+      return [...records].sort((a, b) =>
+        String(b.created_at || '').localeCompare(String(a.created_at || ''))
+      )[0];
+    }
+
+    function statusClass(status) {
+      if (status === 'Stock In') return 'stock-in';
+      if (status === 'Sent to Lab') return 'lab';
+      if (status === 'Fixed / Added to Production') return 'fixed';
+      if (status === 'Rework') return 'rework';
+      return 'stock-out';
+    }
+
+    async function loadReport() {
+      setMessage('Loading report...');
+
+      const from = fromDate.value || '0000-01-01';
+      const to = toDate.value || '9999-12-31';
+
+      const [
+        stockInResult,
+        repairResult,
+        labResult,
+        stockOutResult
+      ] = await Promise.all([
+        db.from('quality_stock_in').select('*').order('received_date', { ascending: false }),
+        db.from('repair_process_records').select('*'),
+        db.from('lab_process_records').select('*'),
+        db.from('quality_stock_out').select('*')
+      ]);
+
+      const error =
+        stockInResult.error ||
+        repairResult.error ||
+        labResult.error ||
+        stockOutResult.error;
+
+      if (error) {
+        setMessage(error.message, true);
+        return;
+      }
+
+      const stockIn = (stockInResult.data || [])
+        .filter(record => record.received_date >= from && record.received_date <= to);
+
+      const repairs = repairResult.data || [];
+      const labs = labResult.data || [];
+      const stockOut = stockOutResult.data || [];
+
+      const repairsByStockId = {};
+      repairs.forEach(record => {
+        if (!repairsByStockId[record.stock_in_id]) repairsByStockId[record.stock_in_id] = [];
+        repairsByStockId[record.stock_in_id].push(record);
+      });
+
+      const labsByRepairId = {};
+      labs.forEach(record => {
+        if (!labsByRepairId[record.repair_id]) labsByRepairId[record.repair_id] = [];
+        labsByRepairId[record.repair_id].push(record);
+      });
+
+      const outByStockId = {};
+      stockOut.forEach(record => {
+        if (!outByStockId[record.stock_in_id]) outByStockId[record.stock_in_id] = [];
+        outByStockId[record.stock_in_id].push(record);
+      });
+
+      let sentToLab = 0;
+      let fixed = 0;
+      let rework = 0;
+      let out = 0;
+
+      reportRows.innerHTML = stockIn.map(phone => {
+        const repair = latestByDate(repairsByStockId[phone.id]);
+        const lab = repair ? latestByDate(labsByRepairId[repair.id]) : null;
+        const stockOutRecord = latestByDate(outByStockId[phone.id]);
+
+        let currentStatus = 'Stock In';
+
+        if (repair && !lab) currentStatus = 'Sent to Lab';
+        if (lab && lab.result === 'Fixed') currentStatus = 'Fixed / Added to Production';
+        if (lab && lab.result === 'Rework') currentStatus = 'Rework';
+        if (stockOutRecord) currentStatus = 'Stock Out';
+
+        if (currentStatus === 'Sent to Lab') sentToLab++;
+        if (currentStatus === 'Fixed / Added to Production') fixed++;
+        if (currentStatus === 'Rework') rework++;
+        if (currentStatus === 'Stock Out') out++;
+
+        return `
+          <tr>
+            <td>${phone.serial_no}</td>
+            <td>${formatDate(phone.received_date)}</td>
+            <td>${phone.model}</td>
+            <td>${phone.storage}</td>
+            <td>${phone.color}</td>
+            <td>${phone.imei}</td>
+            <td>${phone.supplier_grade}</td>
+            <td>${phone.our_grade}</td>
+            <td>${repair ? repair.problem_details || '-' : '-'}</td>
+            <td>${repair ? repair.parts_details || '-' : '-'}</td>
+            <td>${lab ? lab.technician : '-'}</td>
+            <td>${lab ? lab.work_done : '-'}</td>
+            <td>${lab ? `${lab.time_minutes} min` : '-'}</td>
+            <td>${lab ? lab.result : '-'}</td>
+            <td>${stockOutRecord ? formatDate(stockOutRecord.out_date) : '-'}</td>
+            <td><span class="status ${statusClass(currentStatus)}">${currentStatus}</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      totalStockIn.textContent = stockIn.length;
+      totalLab.textContent = sentToLab;
+      totalFixed.textContent = fixed;
+      totalRework.textContent = rework;
+      totalStockOut.textContent = out;
+
+      setMessage('Report updated.');
+    }
+
+    async function logout() {
+      await db.auth.signOut();
+      window.location.href = 'index.html';
+    }
+
+    db.auth.getSession().then(function(result) {
+      if (!result.data.session) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    fromDate.value = '2020-01-01';
+    toDate.valueAsDate = new Date();
+
+    loadReport();
+  </script>
+</body>
+</html>
