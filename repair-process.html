@@ -13,30 +13,23 @@
     .header-logo{width:55px;height:42px;object-fit:contain}
     .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}
     .top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
-    main{max-width:1250px;margin:auto;padding:35px 20px}
+    main{max-width:1350px;margin:auto;padding:35px 20px}
     .box{margin-top:24px;padding:25px;border-radius:14px;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.08)}
-    .scan-row{display:flex;gap:12px;flex-wrap:wrap}
-    .scan-row input{flex:1;min-width:240px}
-    input,textarea{width:100%;padding:12px;border:1px solid #cfd8d2;border-radius:8px;font-size:15px}
+    .scan-row{display:flex;gap:12px;flex-wrap:wrap}.scan-row input{flex:1;min-width:240px}
+    input,select,textarea{width:100%;padding:12px;border:1px solid #cfd8d2;border-radius:8px;font-size:15px}
     #scanImei{border:2px solid #168653;font-size:18px;font-weight:bold}
-    textarea{resize:vertical;min-height:105px}
+    textarea{resize:vertical;min-height:100px}
     button{border:0;border-radius:8px;color:#fff;cursor:pointer;font-weight:bold}
     .find-btn{padding:13px 22px;background:#0b5b38;font-size:15px}
     .save-btn{margin-top:20px;padding:13px 28px;background:#168653;font-size:16px}
-    .delete-btn{padding:8px 11px;background:#d84343}
-    .details{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px;margin-top:22px}
-    .detail{padding:14px;border-radius:8px;background:#e7f5ec}
-    .detail small{display:block;color:#526c5e;margin-bottom:5px}
-    .detail strong{font-size:16px;word-break:break-word}
-    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:22px}
-    .full{grid-column:1/-1}
-    #status{margin-top:14px;min-height:20px;font-weight:bold}
-    .success{color:#0b6e42}.error{color:#c43838}
-    .table-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;margin-top:16px;min-width:1050px}
-    th,td{padding:11px;border-bottom:1px solid #e2e7e4;text-align:center}
-    th{background:#0b5b38;color:#fff}
-    @media(max-width:650px){main{padding:28px 14px}.box{padding:18px}}
+    .add-btn{padding:0 12px;background:#0b5b38;font-size:20px}.remove-btn,.delete-btn{padding:8px 11px;background:#d84343}
+    .field-actions{display:flex;gap:6px}.field-actions select{flex:1}
+    .details{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:22px}
+    .detail{padding:14px;border-radius:8px;background:#e7f5ec}.detail small{display:block;color:#526c5e;margin-bottom:5px}.detail strong{font-size:16px;word-break:break-word}
+    .diagnosis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:16px;margin-top:22px}
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:22px}.full{grid-column:1/-1}
+    #status{margin-top:14px;min-height:20px;font-weight:bold}.success{color:#0b6e42}.error{color:#c43838}
+    .table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;margin-top:16px;min-width:1100px}th,td{padding:11px;border-bottom:1px solid #e2e7e4;text-align:center}th{background:#0b5b38;color:#fff}
   </style>
 </head>
 
@@ -48,7 +41,7 @@
 
   <nav class="top-nav">
     <a href="javascript:history.back()">Back</a>
-    <a href="inventory.html">Inventory Control</a>
+    <a href="quality-control.html">Quality Control</a>
     <a href="dashboard.html">Dashboard</a>
     <a href="index.html">Home / Login</a>
     <a href="#" onclick="logout();return false;">Logout</a>
@@ -56,7 +49,7 @@
 
   <main>
     <h1>Repair Process</h1>
-    <p>Scan IMEI, enter the problem and parts details, then send the phone to Lab.</p>
+    <p>Scan IMEI and enter the phone diagnosis before sending it to Lab.</p>
 
     <div class="box">
       <div class="scan-row">
@@ -69,10 +62,10 @@
       <div class="details">
         <div class="detail"><small>S.No</small><strong id="serialNo">-</strong></div>
         <div class="detail"><small>Model</small><strong id="model">-</strong></div>
-        <div class="detail"><small>Storage / GB</small><strong id="storage">-</strong></div>
-        <div class="detail"><small>Color</small><strong id="color">-</strong></div>
-        <div class="detail"><small>Our Grade</small><strong id="ourGrade">-</strong></div>
+        <div class="detail"><small>Memory</small><strong id="storage">-</strong></div>
+        <div class="detail"><small>Grade</small><strong id="ourGrade">-</strong></div>
         <div class="detail"><small>IMEI</small><strong id="imeiDisplay">-</strong></div>
+        <div class="detail"><small>Color</small><strong id="color">-</strong></div>
       </div>
 
       <div class="form-grid">
@@ -80,15 +73,19 @@
           <label>Repair Date</label>
           <input type="date" id="repairDate">
         </div>
+      </div>
 
+      <div class="diagnosis-grid" id="diagnosisFields"></div>
+
+      <div class="form-grid">
         <div class="full">
-          <label>Problem Details</label>
-          <textarea id="problemDetails" placeholder="Enter phone problems"></textarea>
+          <label>Parts Required / Changed</label>
+          <textarea id="partsDetails" placeholder="Enter parts required or changed"></textarea>
         </div>
 
         <div class="full">
-          <label>Parts Required / Changed</label>
-          <textarea id="partsDetails" placeholder="Enter parts details"></textarea>
+          <label>Remark</label>
+          <textarea id="remark" placeholder="Enter additional remarks"></textarea>
         </div>
       </div>
 
@@ -107,11 +104,12 @@
               <th>Date</th>
               <th>S.No</th>
               <th>Model</th>
-              <th>GB</th>
-              <th>Color</th>
+              <th>Memory</th>
+              <th>Grade</th>
               <th>IMEI</th>
-              <th>Problem Details</th>
-              <th>Parts Details</th>
+              <th>Diagnosis</th>
+              <th>Parts</th>
+              <th>Remark</th>
               <th>Status</th>
               <th>Delete</th>
             </tr>
@@ -131,6 +129,33 @@
 
     let selectedStockIn = null;
 
+    const fields = [
+      ['batteryStatus', 'Battery', 'battery_status'],
+      ['caseStatus', 'Case', 'case_status'],
+      ['glassStatus', 'Glass', 'glass_status'],
+      ['polishStatus', 'Polish', 'polish_status'],
+      ['tpStatus', 'TP', 'tp_status'],
+      ['nfcStatus', 'NFC', 'nfc_status'],
+      ['vibratorStatus', 'Vibrator', 'vibrator_status'],
+      ['speakerStatus', 'Speaker', 'speaker_status'],
+      ['cameraStatus', 'Camera', 'camera_status'],
+      ['faceIdStatus', 'Face ID', 'face_id_status'],
+      ['lcdStatus', 'LCD', 'lcd_status'],
+      ['micStatus', 'Mic', 'mic_status']
+    ];
+
+    const defaultConditions = [
+      'Not Checked',
+      'OK',
+      'Repair Required',
+      'Replace Required',
+      'N/A'
+    ];
+
+    function normalize(value) {
+      return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    }
+
     function setStatus(message, type = '') {
       const status = document.getElementById('status');
       status.className = type;
@@ -143,30 +168,114 @@
       return parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : value;
     }
 
+    function createDiagnosisFields() {
+      diagnosisFields.innerHTML = fields.map(item => `
+        <div>
+          <label>${item[1]}</label>
+          <div class="field-actions">
+            <select id="${item[0]}" class="condition-select"></select>
+            <button class="add-btn" onclick="addCondition()">+</button>
+            <button class="remove-btn" onclick="deleteCondition()">−</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadConditions() {
+      const { data, error } = await db
+        .from('production_options')
+        .select('value')
+        .eq('category', 'qc_condition')
+        .order('value');
+
+      const values = [...defaultConditions, ...(error ? [] : (data || []).map(item => item.value))];
+      const unique = [...new Map(values.map(item => [normalize(item), item])).values()];
+
+      document.querySelectorAll('.condition-select').forEach(select => {
+        const oldValue = select.value;
+
+        select.innerHTML = unique
+          .map(value => `<option value="${value}">${value}</option>`)
+          .join('');
+
+        if (oldValue) select.value = oldValue;
+      });
+    }
+
+    async function addCondition() {
+      const value = prompt('Enter new condition option:');
+
+      if (!value || !value.trim()) return;
+
+      const clean = value.trim();
+
+      const { error } = await db
+        .from('production_options')
+        .insert({
+          category: 'qc_condition',
+          value: clean,
+          normalized_value: normalize(clean)
+        });
+
+      if (error && !error.message.toLowerCase().includes('duplicate')) {
+        setStatus(error.message, 'error');
+        return;
+      }
+
+      await loadConditions();
+      setStatus('Condition option added.', 'success');
+    }
+
+    async function deleteCondition() {
+      const selected = prompt('Enter condition option to delete:');
+
+      if (!selected || !selected.trim()) return;
+      if (!confirm(`Delete "${selected}" from all diagnosis dropdowns?`)) return;
+      if (!await verifyDeleteAccess()) return;
+
+      const { error } = await db
+        .from('production_options')
+        .delete()
+        .eq('category', 'qc_condition')
+        .eq('normalized_value', normalize(selected));
+
+      if (error) {
+        setStatus(error.message, 'error');
+        return;
+      }
+
+      await loadConditions();
+      setStatus('Condition option deleted.', 'success');
+    }
+
     function clearDetails() {
       selectedStockIn = null;
 
-      ['serialNo','model','storage','color','ourGrade','imeiDisplay'].forEach(id => {
+      ['serialNo','model','storage','ourGrade','imeiDisplay','color'].forEach(id => {
         document.getElementById(id).textContent = '-';
       });
 
-      document.getElementById('problemDetails').value = '';
-      document.getElementById('partsDetails').value = '';
-      document.getElementById('saveButton').disabled = true;
+      document.querySelectorAll('.condition-select').forEach(select => {
+        select.value = 'Not Checked';
+      });
+
+      partsDetails.value = '';
+      remark.value = '';
+      saveButton.disabled = true;
     }
 
     function showDetails(record) {
-      document.getElementById('serialNo').textContent = record.serial_no;
-      document.getElementById('model').textContent = record.model;
-      document.getElementById('storage').textContent = record.storage;
-      document.getElementById('color').textContent = record.color;
-      document.getElementById('ourGrade').textContent = record.our_grade;
-      document.getElementById('imeiDisplay').textContent = record.imei;
-      document.getElementById('saveButton').disabled = false;
+      serialNo.textContent = record.serial_no;
+      model.textContent = record.model;
+      storage.textContent = record.storage;
+      ourGrade.textContent = record.our_grade;
+      imeiDisplay.textContent = record.imei;
+      color.textContent = record.color;
+      saveButton.disabled = false;
     }
 
     async function findImei() {
-      const imei = document.getElementById('scanImei').value.trim();
+      const imei = scanImei.value.trim();
 
       clearDetails();
 
@@ -181,44 +290,45 @@
         .eq('imei', imei)
         .maybeSingle();
 
-      if (error) {
-        setStatus(error.message, 'error');
-        return;
-      }
-
-      if (!data) {
-        setStatus('This IMEI was not found in Stock In records.', 'error');
+      if (error || !data) {
+        setStatus('This IMEI was not found in Inventory Entry records.', 'error');
         return;
       }
 
       selectedStockIn = data;
       showDetails(data);
-      setStatus('Phone details found. Enter repair details.', 'success');
+      setStatus('Phone details found. Complete the diagnosis.', 'success');
+    }
+
+    function diagnosisSummary() {
+      return fields.map(item => {
+        const value = document.getElementById(item[0]).value;
+        return `${item[1]}: ${value}`;
+      }).join(' | ');
     }
 
     async function saveRepair() {
-      const problemDetails = document.getElementById('problemDetails').value.trim();
-      const partsDetails = document.getElementById('partsDetails').value.trim();
-
       if (!selectedStockIn) {
         setStatus('Scan an IMEI first.', 'error');
         return;
       }
 
-      if (!problemDetails) {
-        setStatus('Enter problem details.', 'error');
-        return;
-      }
+      const record = {
+        stock_in_id: selectedStockIn.id,
+        repair_date: repairDate.value,
+        problem_details: diagnosisSummary(),
+        parts_details: partsDetails.value.trim(),
+        remark: remark.value.trim(),
+        status: 'Sent to Lab'
+      };
+
+      fields.forEach(item => {
+        record[item[2]] = document.getElementById(item[0]).value;
+      });
 
       const { error } = await db
         .from('repair_process_records')
-        .insert({
-          stock_in_id: selectedStockIn.id,
-          repair_date: document.getElementById('repairDate').value,
-          problem_details: problemDetails,
-          parts_details: partsDetails,
-          status: 'Sent to Lab'
-        });
+        .insert(record);
 
       if (error) {
         setStatus(error.message, 'error');
@@ -227,12 +337,10 @@
 
       setStatus('Repair record saved and sent to Lab.', 'success');
 
-      document.getElementById('scanImei').value = '';
+      scanImei.value = '';
       clearDetails();
-
       await loadRecords();
-
-      document.getElementById('scanImei').focus();
+      scanImei.focus();
     }
 
     async function loadRecords() {
@@ -244,7 +352,7 @@
             serial_no,
             model,
             storage,
-            color,
+            our_grade,
             imei
           )
         `)
@@ -255,36 +363,32 @@
         return;
       }
 
-      document.getElementById('records').innerHTML = (data || [])
-        .map(record => {
-          const phone = record.quality_stock_in || {};
+      records.innerHTML = (data || []).map(record => {
+        const phone = record.quality_stock_in || {};
 
-          return `
-            <tr>
-              <td>${formatDate(record.repair_date)}</td>
-              <td>${phone.serial_no || '-'}</td>
-              <td>${phone.model || '-'}</td>
-              <td>${phone.storage || '-'}</td>
-              <td>${phone.color || '-'}</td>
-              <td>${phone.imei || '-'}</td>
-              <td>${record.problem_details || '-'}</td>
-              <td>${record.parts_details || '-'}</td>
-              <td>${record.status}</td>
-              <td><button class="delete-btn" onclick="deleteRecord('${record.id}')">Delete</button></td>
-            </tr>
-          `;
-        })
-        .join('');
+        return `
+          <tr>
+            <td>${formatDate(record.repair_date)}</td>
+            <td>${phone.serial_no || '-'}</td>
+            <td>${phone.model || '-'}</td>
+            <td>${phone.storage || '-'}</td>
+            <td>${phone.our_grade || '-'}</td>
+            <td>${phone.imei || '-'}</td>
+            <td>${record.problem_details || '-'}</td>
+            <td>${record.parts_details || '-'}</td>
+            <td>${record.remark || '-'}</td>
+            <td>${record.status}</td>
+            <td><button class="delete-btn" onclick="deleteRecord('${record.id}')">Delete</button></td>
+          </tr>
+        `;
+      }).join('');
     }
 
     async function verifyDeleteAccess() {
       const { data: userData } = await db.auth.getUser();
       const user = userData.user;
 
-      if (!user) {
-        setStatus('Please log in again.', 'error');
-        return false;
-      }
+      if (!user) return false;
 
       const { data: passkeys, error: passkeyError } = await db.auth.passkey.list();
 
@@ -346,6 +450,8 @@
       }
     });
 
+    createDiagnosisFields();
+    loadConditions();
     loadRecords();
 
     setTimeout(() => scanImei.focus(), 700);
