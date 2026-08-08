@@ -3,20 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inventory | Greenloop FZC</title>
+  <title>Inventory Control | Greenloop FZC</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     *{box-sizing:border-box;font-family:Arial,sans-serif}
-    body{margin:0;background:#f3f7f4;color:#123c2b}
+    body{margin:0;background:linear-gradient(135deg,#f5fbf7,#e7f3eb);color:#123c2b}
     header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}
     .header-logo{width:55px;height:42px;object-fit:contain}
     .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}
     .top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
-    main{max-width:1050px;margin:auto;padding:45px 20px}
-    .box{margin-top:25px;padding:32px;border-radius:14px;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.08)}
-    h1{margin-bottom:8px;font-size:34px}
-    p{color:#526c5e;font-size:17px;line-height:1.5}
+    main{max-width:1150px;margin:auto;padding:45px 20px}
+    .welcome-box{max-width:720px;margin:0 auto 42px;padding:30px 25px;text-align:center;background:rgba(255,255,255,.76);border:1px solid #d9ebe0;border-radius:24px;box-shadow:0 9px 24px rgba(14,85,50,.08)}
+    h1{margin:0 0 10px;font-size:39px;color:#10442f}
+    .subtitle{margin:0;color:#526c5e;font-size:18px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px}
+    .card{position:relative;display:block;min-height:300px;padding:38px 26px;text-align:center;text-decoration:none;color:#123c2b;background:#fff;border:1px solid #d9ebe0;border-radius:22px;box-shadow:0 10px 25px rgba(14,85,50,.10);overflow:hidden;transition:transform .25s,box-shadow .25s}
+    .card:before{content:"";position:absolute;top:-85px;right:-85px;width:180px;height:180px;border-radius:50%;background:linear-gradient(135deg,rgba(31,158,92,.16),rgba(11,91,56,.04))}
+    .card:hover{transform:translateY(-9px);box-shadow:0 17px 34px rgba(14,85,50,.20)}
+    .icon{position:relative;z-index:1;width:104px;height:104px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;border-radius:30px;background:linear-gradient(135deg,#1ba363,#07512f);box-shadow:0 12px 21px rgba(10,112,61,.28);color:#fff;font-size:42px;font-weight:bold}
+    .card h2{position:relative;z-index:1;margin:0 0 12px;color:#0b5b38;font-size:25px}
+    .card p{position:relative;z-index:1;margin:0;color:#526c5e;font-size:15px;line-height:1.6}
+    .open-text{position:relative;z-index:1;display:inline-block;margin-top:25px;padding:9px 16px;border-radius:20px;background:#e8f6ed;color:#0b5b38;font-size:14px;font-weight:bold}
+    @media(max-width:600px){main{padding:32px 16px}.welcome-box{padding:25px 15px}h1{font-size:31px}}
   </style>
 </head>
 
@@ -34,10 +43,32 @@
   </nav>
 
   <main>
-    <h1>Inventory</h1>
+    <div class="welcome-box">
+      <h1>Inventory Control</h1>
+      <p class="subtitle">Select a process to continue.</p>
+    </div>
 
-    <div class="box">
-      <p>Inventory management will be added here.</p>
+    <div class="cards">
+      <a href="inventory-in.html" class="card">
+        <div class="icon">↓</div>
+        <h2>Inventory Entry</h2>
+        <p>Receive and enter new inventory stock details.</p>
+        <span class="open-text">Open Inventory Entry →</span>
+      </a>
+
+      <a href="repair-process.html" class="card">
+        <div class="icon">⚙</div>
+        <h2>Repair Process</h2>
+        <p>Record phone problems and parts required for repair.</p>
+        <span class="open-text">Open Repair Process →</span>
+      </a>
+
+      <a href="lab-process.html" class="card">
+        <div class="icon">⌕</div>
+        <h2>Lab Process</h2>
+        <p>Assign phones to technicians and record lab results.</p>
+        <span class="open-text">Open Lab Process →</span>
+      </a>
     </div>
   </main>
 
