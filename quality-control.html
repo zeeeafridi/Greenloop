@@ -5,35 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quality Control | Greenloop FZC</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
-    *{box-sizing:border-box;font-family:Arial,sans-serif}
-    body{margin:0;background:linear-gradient(135deg,#f5fbf7,#e7f3eb);color:#123c2b}
-    header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}
-    .header-logo{width:55px;height:42px;object-fit:contain}
-    .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}
-    .top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
-    main{max-width:1150px;margin:auto;padding:45px 20px}
-    .welcome-box{max-width:720px;margin:0 auto 42px;padding:30px 25px;text-align:center;background:rgba(255,255,255,.76);border:1px solid #d9ebe0;border-radius:24px;box-shadow:0 9px 24px rgba(14,85,50,.08)}
-    h1{margin:0 0 10px;font-size:39px;color:#10442f}
-    .subtitle{margin:0;color:#526c5e;font-size:18px}
-    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:25px}
+    *{box-sizing:border-box;font-family:Arial,sans-serif}body{margin:0;background:linear-gradient(135deg,#f5fbf7,#e7f3eb);color:#123c2b}
+    header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}.header-logo{width:55px;height:42px;object-fit:contain}
+    .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}.top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
+    main{max-width:1150px;margin:auto;padding:45px 20px}.welcome-box{max-width:720px;margin:0 auto 42px;padding:30px 25px;text-align:center;background:rgba(255,255,255,.76);border:1px solid #d9ebe0;border-radius:24px;box-shadow:0 9px 24px rgba(14,85,50,.08)}
+    h1{margin:0 0 10px;font-size:39px;color:#10442f}.subtitle{margin:0;color:#526c5e;font-size:18px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:25px}
     .card{position:relative;display:block;min-height:280px;padding:34px 24px;text-align:center;text-decoration:none;color:#123c2b;background:#fff;border:1px solid #d9ebe0;border-radius:22px;box-shadow:0 10px 25px rgba(14,85,50,.10);overflow:hidden;transition:transform .25s,box-shadow .25s}
     .card:before{content:"";position:absolute;top:-85px;right:-85px;width:180px;height:180px;border-radius:50%;background:linear-gradient(135deg,rgba(31,158,92,.16),rgba(11,91,56,.04))}
-    .card:hover{transform:translateY(-9px);box-shadow:0 17px 34px rgba(14,85,50,.20)}
-    .icon{position:relative;z-index:1;width:90px;height:90px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;border-radius:27px;background:linear-gradient(135deg,#1ba363,#07512f);box-shadow:0 12px 21px rgba(10,112,61,.28);color:#fff;font-size:40px;font-weight:bold}
-    .card h2{position:relative;z-index:1;margin:0 0 12px;color:#0b5b38;font-size:23px}
-    .card p{position:relative;z-index:1;margin:0;color:#526c5e;font-size:14px;line-height:1.6}
-    .open-text{position:relative;z-index:1;display:inline-block;margin-top:21px;padding:9px 14px;border-radius:20px;background:#e8f6ed;color:#0b5b38;font-size:13px;font-weight:bold}
-    @media(max-width:600px){main{padding:32px 16px}.welcome-box{padding:25px 15px}h1{font-size:31px}}
+    .card:hover{transform:translateY(-9px);box-shadow:0 17px 34px rgba(14,85,50,.20)}.icon{position:relative;z-index:1;width:90px;height:90px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;border-radius:27px;background:linear-gradient(135deg,#1ba363,#07512f);box-shadow:0 12px 21px rgba(10,112,61,.28);color:#fff;font-size:40px;font-weight:bold}
+    .card h2{position:relative;z-index:1;margin:0 0 12px;color:#0b5b38;font-size:23px}.card p{position:relative;z-index:1;margin:0;color:#526c5e;font-size:14px;line-height:1.6}.open-text{position:relative;z-index:1;display:inline-block;margin-top:21px;padding:9px 14px;border-radius:20px;background:#e8f6ed;color:#0b5b38;font-size:13px;font-weight:bold}
   </style>
 </head>
-
 <body>
-  <header>
-    <img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">
-    Greenloop FZC
-  </header>
+  <header><img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">Greenloop FZC</header>
 
   <nav class="top-nav">
     <a href="javascript:history.back()">Back</a>
@@ -56,17 +41,10 @@
         <span class="open-text">Open Inventory Entry →</span>
       </a>
 
-      <a href="stock-out.html" class="card">
-        <div class="icon">↑</div>
-        <h2>Stock Out</h2>
-        <p>Scan IMEI and issue phones from Quality Control.</p>
-        <span class="open-text">Open Stock Out →</span>
-      </a>
-
       <a href="repair-process.html" class="card">
         <div class="icon">⚙</div>
         <h2>Repair Process</h2>
-        <p>Record phone problems and parts required for repair.</p>
+        <p>Check phone problems and parts required for repair.</p>
         <span class="open-text">Open Repair Process →</span>
       </a>
 
@@ -76,24 +54,29 @@
         <p>Assign phones to technicians and save lab results.</p>
         <span class="open-text">Open Lab Process →</span>
       </a>
+
+      <a href="stock-out.html" class="card">
+        <div class="icon">↑</div>
+        <h2>Stock Out</h2>
+        <p>Scan IMEI and issue phones from Quality Control.</p>
+        <span class="open-text">Open Stock Out →</span>
+      </a>
     </div>
   </main>
 
   <script>
-    const db = window.supabase.createClient(
+    const db=window.supabase.createClient(
       'https://ohvplvdxflmgqoptwftk.supabase.co',
       'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH'
     );
 
-    async function logout() {
+    async function logout(){
       await db.auth.signOut();
-      window.location.href = 'index.html';
+      window.location.href='index.html';
     }
 
-    db.auth.getSession().then(function(result) {
-      if (!result.data.session) {
-        window.location.href = 'index.html';
-      }
+    db.auth.getSession().then(function(result){
+      if(!result.data.session)window.location.href='index.html';
     });
   </script>
 </body>
