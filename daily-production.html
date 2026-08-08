@@ -4,159 +4,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daily Production | Greenloop FZC</title>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-
-    body {
-      margin: 0;
-      background: #f3f7f4;
-      color: #163d2d;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 8%;
-      background: #0b5b38;
-      color: white;
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .logo {
-      width: 55px;
-      height: 42px;
-      object-fit: contain;
-    }
-
-    nav {
-      padding: 14px 8%;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      background: #e5f3ea;
-    }
-
-    nav a {
-      padding: 10px 16px;
-      color: #0b5b38;
-      background: white;
-      border-radius: 7px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    main {
-      max-width: 1200px;
-      margin: auto;
-      padding: 35px 20px;
-    }
-
-    .box {
-      margin-top: 25px;
-      padding: 25px;
-      border-radius: 14px;
-      background: white;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-      overflow-x: auto;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 18px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 7px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #cfd8d2;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .actions select {
-      flex: 1;
-    }
-
-    button {
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .add {
-      padding: 0 12px;
-      background: #0b5b38;
-      font-size: 20px;
-    }
-
-    .remove, .delete-btn {
-      padding: 7px 10px;
-      background: #d84343;
-    }
-
-    .save-btn {
-      margin-top: 24px;
-      padding: 13px 28px;
-      background: #168653;
-      font-size: 16px;
-    }
-
-    .info {
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 8px;
-      background: #e7f5ec;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-    }
-
-    th, td {
-      padding: 11px;
-      border-bottom: 1px solid #e2e7e4;
-      text-align: center;
-    }
-
-    th {
-      background: #0b5b38;
-      color: white;
-    }
+    *{box-sizing:border-box;font-family:Arial,sans-serif}
+    body{margin:0;background:#f3f7f4;color:#163d2d}
+    header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}
+    .header-logo{width:55px;height:42px;object-fit:contain}
+    .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}
+    .top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
+    main{max-width:1200px;margin:auto;padding:35px 20px}
+    .box{margin-top:25px;padding:25px;border-radius:14px;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.08);overflow-x:auto}
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+    label{display:block;margin-bottom:7px;font-weight:bold;font-size:14px}
+    input,select{width:100%;padding:12px;border:1px solid #cfd8d2;border-radius:8px;font-size:15px}
+    .actions{display:flex;gap:6px}.actions select{flex:1}
+    button{border:0;border-radius:8px;color:#fff;cursor:pointer;font-weight:bold}
+    .add{padding:0 12px;background:#0b5b38;font-size:20px}
+    .remove,.delete-btn{padding:7px 10px;background:#d84343}
+    .save{margin-top:24px;padding:13px 28px;background:#168653;font-size:16px}
+    .info{margin-top:20px;padding:16px;border-radius:8px;background:#e7f5ec}
+    .status{margin-top:12px;font-size:14px;color:#0b5b38}
+    table{width:100%;border-collapse:collapse;margin-top:16px}
+    th,td{padding:11px;border-bottom:1px solid #e2e7e4;text-align:center}
+    th{background:#0b5b38;color:#fff}
   </style>
 </head>
 
 <body>
   <header>
-    <img src="looplogo.jpg" alt="Greenloop Logo" class="logo">
+    <img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">
     Greenloop FZC
   </header>
 
-  <nav>
-    <a href="dashboard.html">← Dashboard</a>
-    <a href="index.html">⌂ Home / Login</a>
-    <a href="production-report.html">📊 Reports</a>
+  <nav class="top-nav">
+    <a href="javascript:history.back()">Back</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="index.html">Home / Login</a>
+    <a href="production-report.html">Reports</a>
+    <a href="#" onclick="logout();return false;">Logout</a>
   </nav>
 
   <main>
@@ -174,8 +59,8 @@
           <label>Model</label>
           <div class="actions">
             <select id="model"></select>
-            <button class="add" type="button" onclick="addOption('model')">+</button>
-            <button class="remove" type="button" onclick="deleteOption('model')">−</button>
+            <button class="add" onclick="addOption('model')">+</button>
+            <button class="remove" onclick="deleteOption('model')">−</button>
           </div>
         </div>
 
@@ -183,8 +68,8 @@
           <label>Storage / GB</label>
           <div class="actions">
             <select id="storage"></select>
-            <button class="add" type="button" onclick="addOption('storage')">+</button>
-            <button class="remove" type="button" onclick="deleteOption('storage')">−</button>
+            <button class="add" onclick="addOption('storage')">+</button>
+            <button class="remove" onclick="deleteOption('storage')">−</button>
           </div>
         </div>
 
@@ -192,8 +77,8 @@
           <label>Color</label>
           <div class="actions">
             <select id="color"></select>
-            <button class="add" type="button" onclick="addOption('color')">+</button>
-            <button class="remove" type="button" onclick="deleteOption('color')">−</button>
+            <button class="add" onclick="addOption('color')">+</button>
+            <button class="remove" onclick="deleteOption('color')">−</button>
           </div>
         </div>
 
@@ -201,8 +86,8 @@
           <label>Grade</label>
           <div class="actions">
             <select id="grade"></select>
-            <button class="add" type="button" onclick="addOption('grade')">+</button>
-            <button class="remove" type="button" onclick="deleteOption('grade')">−</button>
+            <button class="add" onclick="addOption('grade')">+</button>
+            <button class="remove" onclick="deleteOption('grade')">−</button>
           </div>
         </div>
 
@@ -219,12 +104,11 @@
 
       <div class="info">
         <strong>Calculated Day End Stock:</strong>
-        <span id="preview">0</span> units
+        <span id="stockPreview">0</span> units
       </div>
 
-      <button class="save-btn" type="button" onclick="saveRecord()">
-        Save Daily Production
-      </button>
+      <button class="save" onclick="saveRecord()">Save Daily Production</button>
+      <div class="status" id="status"></div>
     </div>
 
     <div class="box">
@@ -244,262 +128,209 @@
             <th>Delete</th>
           </tr>
         </thead>
-
-        <tbody id="rows"></tbody>
+        <tbody id="records"></tbody>
       </table>
     </div>
   </main>
 
   <script>
     const db = window.supabase.createClient(
-      "https://ohvplvdxflmgqoptwftk.supabase.co",
-      "sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH"
+      'https://ohvplvdxflmgqoptwftk.supabase.co',
+      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH',
+      {
+        auth: {
+          experimental: {
+            passkey: true
+          }
+        }
+      }
     );
 
-    const deletePassword = "1213";
     let records = [];
 
-    const defaultOptions = {
-      model: ["iPhone 13", "Samsung S23"],
-      storage: ["-", "64 GB", "128 GB", "256 GB"],
-      color: ["-", "Black", "White", "Blue", "Green"],
-      grade: ["A", "B", "Bulges A", "Bulges B"]
+    const defaults = {
+      model: ['iPhone 13', 'Samsung S23'],
+      storage: ['-', '64 GB', '128 GB', '256 GB'],
+      color: ['-', 'Black', 'White', 'Blue', 'Green'],
+      grade: ['A', 'B', 'Bulges A', 'Bulges B', 'RMA']
     };
 
-    function normalize(value) {
-      return String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+    const normalize = value =>
+      String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+
+    function setStatus(message, error = false) {
+      status.textContent = message;
+      status.style.color = error ? '#d84343' : '#0b5b38';
     }
 
-    async function syncOptionsFromLaptop() {
-      for (const category of Object.keys(defaultOptions)) {
-        const savedOptions = JSON.parse(
-          localStorage.getItem(category + "Options") || "[]"
-        );
+    function loadOptions(id) {
+      const saved = localStorage.getItem(id + 'Options');
+      const list = saved ? JSON.parse(saved) : [...defaults[id]];
+      const output = [];
+      const used = [];
 
-        const options = [...defaultOptions[category], ...savedOptions];
-        const unique = [];
-
-        options.forEach(function(value) {
-          if (!unique.some(item => normalize(item) === normalize(value))) {
-            unique.push(value.trim());
-          }
-        });
-
-        const rows = unique.map(function(value) {
-          return {
-            category: category,
-            value: value,
-            normalized_value: normalize(value)
-          };
-        });
-
-        await db
-          .from("production_options")
-          .upsert(rows, {
-            onConflict: "category,normalized_value",
-            ignoreDuplicates: true
-          });
-      }
-    }
-
-    async function loadOptions(category) {
-      const { data, error } = await db
-        .from("production_options")
-        .select("id, value")
-        .eq("category", category)
-        .order("value");
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      const select = document.getElementById(category);
-      select.innerHTML = "";
-
-      (data || []).forEach(function(item) {
-        select.innerHTML += `<option value="${item.value}">${item.value}</option>`;
+      list.forEach(value => {
+        if (!used.includes(normalize(value))) {
+          used.push(normalize(value));
+          output.push(value.trim());
+        }
       });
+
+      localStorage.setItem(id + 'Options', JSON.stringify(output));
+
+      document.getElementById(id).innerHTML = output
+        .map(value => `<option value="${value}">${value}</option>`)
+        .join('');
     }
 
-    async function addOption(category) {
-      const value = prompt("Enter new option:");
+    function addOption(id) {
+      const value = prompt('Enter new option:');
 
-      if (!value || value.trim() === "") {
+      if (!value || !value.trim()) return;
+
+      const list = JSON.parse(localStorage.getItem(id + 'Options')) || [];
+      const existing = list.find(item => normalize(item) === normalize(value));
+
+      if (existing) {
+        document.getElementById(id).value = existing;
         return;
       }
 
-      const { error } = await db
-        .from("production_options")
-        .insert({
-          category: category,
-          value: value.trim(),
-          normalized_value: normalize(value)
-        });
+      list.push(value.trim());
+      localStorage.setItem(id + 'Options', JSON.stringify(list));
 
-      if (error && !error.message.includes("duplicate")) {
-        alert(error.message);
-        return;
-      }
-
-      await loadOptions(category);
-      document.getElementById(category).value = value.trim();
-      updateStockPreview();
+      loadOptions(id);
+      document.getElementById(id).value = value.trim();
+      updatePreview();
     }
 
-    async function deleteOption(category) {
-      const password = prompt("Enter delete password:");
+    async function deleteOption(id) {
+      const value = document.getElementById(id).value;
 
-      if (password !== deletePassword) {
-        alert("Incorrect password.");
-        return;
-      }
+      if (!confirm(`Delete "${value}" from the list?`)) return;
+      if (!await verifyDeleteAccess()) return;
 
-      const value = document.getElementById(category).value;
+      const list = (JSON.parse(localStorage.getItem(id + 'Options')) || [])
+        .filter(item => normalize(item) !== normalize(value));
 
-      if (!confirm(`Delete "${value}" from the list?`)) {
-        return;
-      }
+      localStorage.setItem(id + 'Options', JSON.stringify(list));
 
-      const { error } = await db
-        .from("production_options")
-        .delete()
-        .eq("category", category)
-        .eq("normalized_value", normalize(value));
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      await loadOptions(category);
-      updateStockPreview();
+      loadOptions(id);
+      updatePreview();
+      setStatus('Dropdown option deleted.');
     }
 
     async function loadRecords() {
       const { data, error } = await db
-        .from("production_records")
-        .select("*")
-        .order("record_date", { ascending: false });
+        .from('production_records')
+        .select('*')
+        .order('record_date', { ascending: false });
 
       if (error) {
-        alert(error.message);
+        setStatus(error.message, true);
         return;
       }
 
       records = data || [];
       showRecords();
-      updateStockPreview();
+      updatePreview();
     }
 
-    function getPreviousStock() {
-      const date = document.getElementById("date").value;
-      const model = document.getElementById("model").value;
-      const storage = document.getElementById("storage").value;
-      const color = document.getElementById("color").value;
-      const grade = document.getElementById("grade").value;
+    function previousStock() {
+      const selectedDate = date.value;
+      const selectedModel = model.value;
+      const selectedStorage = storage.value;
+      const selectedColor = color.value;
+      const selectedGrade = grade.value;
 
-      const previousRecords = records.filter(function(record) {
-        return record.record_date < date &&
-          normalize(record.model) === normalize(model) &&
-          normalize(record.storage) === normalize(storage) &&
-          normalize(record.color) === normalize(color) &&
-          normalize(record.grade) === normalize(grade);
-      });
+      const matchingRecords = records
+        .filter(record =>
+          record.record_date < selectedDate &&
+          normalize(record.model) === normalize(selectedModel) &&
+          normalize(record.storage) === normalize(selectedStorage) &&
+          normalize(record.color) === normalize(selectedColor) &&
+          normalize(record.grade) === normalize(selectedGrade)
+        )
+        .sort((a, b) => b.record_date.localeCompare(a.record_date));
 
-      previousRecords.sort(function(a, b) {
-        return b.record_date.localeCompare(a.record_date);
-      });
-
-      return previousRecords.length
-        ? Number(previousRecords[0].closing_stock) || 0
+      return matchingRecords.length
+        ? Number(matchingRecords[0].closing_stock) || 0
         : 0;
     }
 
-    function updateStockPreview() {
-      const production = Number(
-        document.getElementById("productionQty").value
-      ) || 0;
+    function updatePreview() {
+      const production = Number(productionQty.value) || 0;
+      const exportQty = Number(exportQty.value) || 0;
 
-      const exportQty = Number(
-        document.getElementById("exportQty").value
-      ) || 0;
-
-      document.getElementById("preview").textContent =
-        getPreviousStock() + production - exportQty;
+      stockPreview.textContent = previousStock() + production - exportQty;
     }
 
     async function saveRecord() {
-      const date = document.getElementById("date").value;
-      const model = document.getElementById("model").value;
-      const storage = document.getElementById("storage").value;
-      const color = document.getElementById("color").value;
-      const grade = document.getElementById("grade").value;
-      const production = Number(document.getElementById("productionQty").value);
-      const exportQty = Number(document.getElementById("exportQty").value) || 0;
+      const selectedDate = date.value;
+      const production = Number(productionQty.value);
+      const exportQty = Number(exportQty.value) || 0;
 
-      if (!date || Number.isNaN(production)) {
-        alert("Please enter Date and Produced Quantity.");
+      if (!selectedDate || Number.isNaN(production)) {
+        setStatus('Please enter Date and Produced Quantity.', true);
         return;
       }
 
-      const oldRecord = records.find(function(record) {
-        return record.record_date === date &&
-          normalize(record.model) === normalize(model) &&
-          normalize(record.storage) === normalize(storage) &&
-          normalize(record.color) === normalize(color) &&
-          normalize(record.grade) === normalize(grade);
-      });
+      const openingStock = previousStock();
 
-      const openingStock = oldRecord
-        ? Number(oldRecord.opening_stock) || 0
-        : getPreviousStock();
-
-      const totalProduction =
-        (oldRecord ? Number(oldRecord.production) || 0 : 0) + production;
-
-      const totalExport =
-        (oldRecord ? Number(oldRecord.export_qty) || 0 : 0) + exportQty;
-
-      const closingStock = openingStock + totalProduction - totalExport;
-
-      if (closingStock < 0) {
-        alert("Export quantity is more than available stock.");
-        return;
-      }
-
-      const payload = {
-        record_date: date,
-        model: model,
-        storage: storage,
-        color: color,
-        grade: grade,
-        production: totalProduction,
-        export_qty: totalExport,
+      const record = {
+        record_date: selectedDate,
+        model: model.value,
+        storage: storage.value,
+        color: color.value,
+        grade: grade.value,
+        production: production,
+        export_qty: exportQty,
         opening_stock: openingStock,
-        closing_stock: closingStock
+        closing_stock: openingStock + production - exportQty
       };
 
-      const result = oldRecord
-        ? await db.from("production_records").update(payload).eq("id", oldRecord.id)
-        : await db.from("production_records").insert(payload);
+      const oldRecord = records.find(item =>
+        item.record_date === record.record_date &&
+        normalize(item.model) === normalize(record.model) &&
+        normalize(item.storage) === normalize(record.storage) &&
+        normalize(item.color) === normalize(record.color) &&
+        normalize(item.grade) === normalize(record.grade)
+      );
 
-      if (result.error) {
-        alert(result.error.message);
+      if (oldRecord) {
+        record.production = (Number(oldRecord.production) || 0) + production;
+        record.export_qty = (Number(oldRecord.export_qty) || 0) + exportQty;
+        record.opening_stock = Number(oldRecord.opening_stock) || openingStock;
+        record.closing_stock =
+          record.opening_stock + record.production - record.export_qty;
+      }
+
+      if (record.closing_stock < 0) {
+        setStatus('Export quantity is more than available stock.', true);
         return;
       }
 
-      document.getElementById("productionQty").value = "";
-      document.getElementById("exportQty").value = "0";
+      const result = oldRecord
+        ? await db.from('production_records').update(record).eq('id', oldRecord.id)
+        : await db.from('production_records').insert(record);
+
+      if (result.error) {
+        setStatus(result.error.message, true);
+        return;
+      }
+
+      productionQty.value = '';
+      exportQty.value = '0';
+      setStatus('Record saved.');
 
       await loadRecords();
     }
 
     function showRecords() {
-      const table = document.getElementById("rows");
+      records.sort((a, b) => b.record_date.localeCompare(a.record_date));
 
-      table.innerHTML = records.map(function(record) {
-        return `
+      document.getElementById('records').innerHTML = records
+        .map(record => `
           <tr>
             <td>${record.record_date}</td>
             <td>${record.model}</td>
@@ -510,69 +341,98 @@
             <td>${record.export_qty}</td>
             <td><strong>${record.closing_stock}</strong></td>
             <td>
-              <button class="delete-btn" onclick="deleteRecord('${record.id}')">
-                Delete
-              </button>
+              <button class="delete-btn" onclick="deleteRecord('${record.id}')">Delete</button>
             </td>
           </tr>
-        `;
-      }).join("");
+        `)
+        .join('');
+    }
+
+    async function verifyDeleteAccess() {
+      const { data: userData } = await db.auth.getUser();
+      const user = userData.user;
+
+      if (!user) {
+        setStatus('Please log in again.', true);
+        return false;
+      }
+
+      const { data: passkeys, error: passkeyError } = await db.auth.passkey.list();
+
+      if (!passkeyError && (!passkeys || !passkeys.length)) {
+        setStatus('Set up Windows Hello Face or PIN.');
+
+        const { error } = await db.auth.registerPasskey();
+
+        if (!error) return true;
+      }
+
+      if (!passkeyError && passkeys && passkeys.length) {
+        const { error } = await db.auth.signInWithPasskey();
+
+        if (!error) return true;
+      }
+
+      const password = prompt(
+        'Face verification unavailable. Enter your account password:'
+      );
+
+      if (!password) return false;
+
+      const { error } = await db.auth.signInWithPassword({
+        email: user.email,
+        password: password
+      });
+
+      if (error) {
+        setStatus('Incorrect account password.', true);
+        return false;
+      }
+
+      return true;
     }
 
     async function deleteRecord(id) {
-      const password = prompt("Enter delete password:");
-
-      if (password !== deletePassword) {
-        alert("Incorrect password.");
-        return;
-      }
-
-      if (!confirm("Delete this production record?")) {
-        return;
-      }
+      if (!confirm('Delete this production record?')) return;
+      if (!await verifyDeleteAccess()) return;
 
       const { error } = await db
-        .from("production_records")
+        .from('production_records')
         .delete()
-        .eq("id", id);
+        .eq('id', id);
 
       if (error) {
-        alert(error.message);
+        setStatus(error.message, true);
         return;
       }
 
+      setStatus('Record deleted.');
       await loadRecords();
     }
 
-    async function initializeApp() {
-      document.getElementById("date").valueAsDate = new Date();
+    async function logout() {
+      await db.auth.signOut();
+      window.location.href = 'index.html';
+    }
 
-      await syncOptionsFromLaptop();
-
-      for (const category of Object.keys(defaultOptions)) {
-        await loadOptions(category);
-
-        document
-          .getElementById(category)
-          .addEventListener("change", updateStockPreview);
+    db.auth.getSession().then(result => {
+      if (!result.data.session) {
+        window.location.href = 'index.html';
       }
+    });
 
-      document
-        .getElementById("date")
-        .addEventListener("change", updateStockPreview);
+    date.valueAsDate = new Date();
 
-      document
-        .getElementById("productionQty")
-        .addEventListener("input", updateStockPreview);
+    ['model', 'storage', 'color', 'grade'].forEach(id => {
+      loadOptions(id);
+      document.getElementById(id).addEventListener('change', updatePreview);
+    });
 
-      document
-        .getElementById("exportQty")
-        .addEventListener("input", updateStockPreview);
+    date.addEventListener('change', updatePreview);
+    productionQty.addEventListener('input', updatePreview);
+    exportQty.addEventListener('input', updatePreview);
 
-      await loadRecords();
-    }
-
-    initializeApp();
+    loadRecords();
   </script>
 </body>
 </html>
