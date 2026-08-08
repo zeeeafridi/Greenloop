@@ -4,534 +4,993 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lab Process | Greenloop FZC</title>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    *{box-sizing:border-box;font-family:Arial,sans-serif}
-    body{margin:0;background:#f3f7f4;color:#123c2b}
-    header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}
-    .header-logo{width:55px;height:42px;object-fit:contain}
-    .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}
-    .top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
-    main{max-width:1250px;margin:auto;padding:35px 20px}
-    .box{margin-top:24px;padding:25px;border-radius:14px;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.08)}
-    .scan-row{display:flex;gap:12px;flex-wrap:wrap}
-    .scan-row input{flex:1;min-width:240px}
-    input,select,textarea{width:100%;padding:12px;border:1px solid #cfd8d2;border-radius:8px;font-size:15px}
-    #scanImei{border:2px solid #168653;font-size:18px;font-weight:bold}
-    textarea{resize:vertical;min-height:105px}
-    button{border:0;border-radius:8px;color:#fff;cursor:pointer;font-weight:bold}
-    .find-btn{padding:13px 22px;background:#0b5b38;font-size:15px}
-    .save-btn{margin-top:20px;padding:13px 28px;background:#168653;font-size:16px}
-    .add-btn{padding:0 13px;background:#0b5b38;font-size:20px}
-    .remove-btn,.delete-btn{padding:8px 11px;background:#d84343}
-    .field-actions{display:flex;gap:6px}.field-actions select{flex:1}
-    .details{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px;margin-top:22px}
-    .detail{padding:14px;border-radius:8px;background:#e7f5ec}
-    .detail small{display:block;color:#526c5e;margin-bottom:5px}
-    .detail strong{font-size:16px;word-break:break-word}
-    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:22px}
-    .full{grid-column:1/-1}
-    #status{margin-top:14px;min-height:20px;font-weight:bold}
-    .success{color:#0b6e42}.error{color:#c43838}
-    .table-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;margin-top:16px;min-width:1050px}
-    th,td{padding:11px;border-bottom:1px solid #e2e7e4;text-align:center}
-    th{background:#0b5b38;color:#fff}
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3faf6;
+      color: #073d2a;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, #063e2a, #0b6a45);
+      color: white;
+      padding: 16px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .brand img {
+      width: 45px;
+      height: 45px;
+      object-fit: contain;
+      background: white;
+      border-radius: 50%;
+      padding: 3px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 14px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .nav-btn {
+      background: white;
+      color: #07633d;
+    }
+
+    .logout-btn {
+      background: #d94343;
+      color: white;
+    }
+
+    .container {
+      width: min(1100px, calc(100% - 28px));
+      margin: auto;
+      padding: 32px 0 55px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 36px;
+    }
+
+    .subtitle {
+      margin: 9px 0 25px;
+      color: #607b6e;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      background: white;
+      color: #07633d;
+      border: 1px solid #cce5d7;
+    }
+
+    .tab.active {
+      background: #087143;
+      color: white;
+    }
+
+    .panel {
+      display: none;
+      background: white;
+      padding: 26px;
+      border-radius: 17px;
+      box-shadow: 0 8px 22px rgba(5, 84, 49, 0.09);
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .scan-box {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cbded2;
+      border-radius: 9px;
+      padding: 12px;
+      font-size: 15px;
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 95px;
+      resize: vertical;
+    }
+
+    .green-btn {
+      background: #087143;
+      color: white;
+    }
+
+    .info-box {
+      display: none;
+      background: #e7f6ed;
+      border-left: 5px solid #25a96b;
+      border-radius: 10px;
+      padding: 17px;
+      margin: 16px 0 20px;
+      line-height: 1.8;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .info-item {
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .info-item strong {
+      display: block;
+      color: #087143;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 17px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field label {
+      font-weight: bold;
+      font-size: 14px;
+      color: #075334;
+    }
+
+    .full {
+      grid-column: span 2;
+    }
+
+    .technician-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+    }
+
+    .plus-btn {
+      background: #087143;
+      color: white;
+      font-size: 21px;
+      padding: 6px 13px;
+    }
+
+    .minus-btn {
+      background: #d94343;
+      color: white;
+      font-size: 21px;
+      padding: 6px 13px;
+    }
+
+    .save-btn {
+      margin-top: 22px;
+      background: #087143;
+      color: white;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+    }
+
+    .status {
+      margin-top: 15px;
+      min-height: 20px;
+      color: #087143;
+      font-weight: bold;
+    }
+
+    .recent-title {
+      margin: 32px 0 13px;
+      font-size: 23px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(5, 84, 49, 0.08);
+    }
+
+    table {
+      width: 100%;
+      min-width: 1100px;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #07633d;
+      color: white;
+      padding: 13px 10px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e5f0e9;
+      font-size: 13px;
+    }
+
+    .pending {
+      color: #956000;
+      font-weight: bold;
+    }
+
+    .fixed {
+      color: #087143;
+      font-weight: bold;
+    }
+
+    .rework {
+      color: #c33131;
+      font-weight: bold;
+    }
+
+    @media (max-width: 700px) {
+      .topbar { padding: 14px; }
+
+      .top-actions {
+        width: 100%;
+      }
+
+      .top-actions button {
+        flex: 1;
+        padding: 10px 7px;
+      }
+
+      .container {
+        width: min(100% - 20px, 700px);
+        padding-top: 24px;
+      }
+
+      h1 { font-size: 29px; }
+
+      .panel { padding: 18px; }
+
+      .scan-box {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .full {
+        grid-column: span 1;
+      }
+
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
   </style>
 </head>
 
 <body>
-  <header>
-    <img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">
-    Greenloop FZC
+  <header class="topbar">
+    <div class="brand">
+      <img src="looplogo.jpg" alt="Greenloop Logo">
+      <span>Greenloop FZC</span>
+    </div>
+
+    <div class="top-actions">
+      <button class="nav-btn" onclick="goBack()">← Back</button>
+      <button class="nav-btn" onclick="location.href='quality-control.html'">Quality Control</button>
+      <button class="nav-btn" onclick="location.href='dashboard.html'">⌂ Dashboard</button>
+      <button class="nav-btn" onclick="location.href='index.html'">⌂ Home</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
   </header>
 
-  <nav class="top-nav">
-    <a href="javascript:history.back()">Back</a>
-    <a href="inventory.html">Inventory Control</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="index.html">Home / Login</a>
-    <a href="#" onclick="logout();return false;">Logout</a>
-  </nav>
-
-  <main>
+  <main class="container">
     <h1>Lab Process</h1>
-    <p>Scan IMEI, assign the technician, and complete the lab result.</p>
+    <p class="subtitle">Assign phones to technicians and record automatic turnaround time.</p>
 
-    <div class="box">
-      <div class="scan-row">
-        <input type="text" id="scanImei" placeholder="Click here and scan IMEI" inputmode="numeric" autocomplete="off">
-        <button class="find-btn" onclick="findImei()">Find IMEI</button>
+    <div class="tabs">
+      <button id="assignTab" class="tab active" onclick="showPanel('assign')">Assign to Technician</button>
+      <button id="returnTab" class="tab" onclick="showPanel('return')">Phone Return</button>
+    </div>
+
+    <section id="assignPanel" class="panel active">
+      <h2>Assign Phone to Technician</h2>
+      <p class="subtitle">Scan the IMEI. Assignment date and time will be saved automatically.</p>
+
+      <div class="scan-box">
+        <input id="assignImei" type="text" placeholder="Scan or enter IMEI" autocomplete="off">
+        <button class="green-btn" onclick="findForAssignment()">Find Phone</button>
       </div>
 
-      <div id="status"></div>
+      <div id="assignPhoneInfo" class="info-box"></div>
 
-      <div class="details">
-        <div class="detail"><small>S.No</small><strong id="serialNo">-</strong></div>
-        <div class="detail"><small>Model</small><strong id="model">-</strong></div>
-        <div class="detail"><small>Storage / GB</small><strong id="storage">-</strong></div>
-        <div class="detail"><small>Color</small><strong id="color">-</strong></div>
-        <div class="detail"><small>Our Grade</small><strong id="ourGrade">-</strong></div>
-        <div class="detail"><small>IMEI</small><strong id="imeiDisplay">-</strong></div>
-      </div>
-
-      <div class="form-grid">
-        <div>
-          <label>Lab Date</label>
-          <input type="date" id="labDate">
-        </div>
-
-        <div>
-          <label>Technician</label>
-          <div class="field-actions">
-            <select id="technician"></select>
-            <button class="add-btn" onclick="addTechnician()">+</button>
-            <button class="remove-btn" onclick="deleteTechnician()">−</button>
+      <div id="assignForm" style="display:none;">
+        <div class="form-grid">
+          <div class="field full">
+            <label>Technician</label>
+            <div class="technician-row">
+              <select id="technician"></select>
+              <button class="plus-btn" onclick="addTechnician()" type="button">+</button>
+              <button class="minus-btn" onclick="deleteTechnician()" type="button">−</button>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label>Time Taken (Minutes)</label>
-          <input type="number" id="timeMinutes" min="0" value="0">
-        </div>
+        <button class="save-btn" onclick="assignToTechnician()">Assign to Technician</button>
+        <div id="assignStatus" class="status"></div>
+      </div>
+    </section>
 
-        <div>
-          <label>Lab Result</label>
-          <select id="result">
-            <option value="Fixed">Fixed</option>
-            <option value="Rework">Not Fixed / Rework</option>
-          </select>
-        </div>
+    <section id="returnPanel" class="panel">
+      <h2>Phone Return from Technician</h2>
+      <p class="subtitle">Scan the IMEI again when the technician returns the phone.</p>
 
-        <div class="full">
-          <label>Work Done</label>
-          <textarea id="workDone" placeholder="Enter work completed by technician"></textarea>
-        </div>
+      <div class="scan-box">
+        <input id="returnImei" type="text" placeholder="Scan or enter IMEI" autocomplete="off">
+        <button class="green-btn" onclick="findForReturn()">Find Phone</button>
       </div>
 
-      <button class="save-btn" id="saveButton" onclick="saveLabProcess()" disabled>
-        Save Lab Process
-      </button>
-    </div>
+      <div id="returnPhoneInfo" class="info-box"></div>
 
-    <div class="box">
-      <h2>Lab Process Records</h2>
+      <div id="returnForm" style="display:none;">
+        <div class="form-grid">
+          <div class="field">
+            <label>Assigned Date and Time</label>
+            <input id="assignedDateTime" type="text" readonly>
+          </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>S.No</th>
-              <th>Model</th>
-              <th>IMEI</th>
-              <th>Technician</th>
-              <th>Work Done</th>
-              <th>Time</th>
-              <th>Result</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody id="records"></tbody>
-        </table>
+          <div class="field">
+            <label>Return Date and Time</label>
+            <input id="returnedDateTime" type="text" readonly>
+          </div>
+
+          <div class="field">
+            <label>Technician</label>
+            <input id="returnedTechnician" type="text" readonly>
+          </div>
+
+          <div class="field">
+            <label>Repair Time</label>
+            <input id="repairTime" type="text" readonly>
+          </div>
+
+          <div class="field full">
+            <label>Work Done</label>
+            <textarea id="workDone" placeholder="Enter repair work completed"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Result</label>
+            <select id="result">
+              <option value="Fixed">Fixed</option>
+              <option value="Rework">Rework</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="save-btn" onclick="completeLabProcess()">Save Return Result</button>
+        <div id="returnStatus" class="status"></div>
       </div>
+    </section>
+
+    <h2 class="recent-title">Recent Lab Records</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Model</th>
+            <th>GB</th>
+            <th>IMEI</th>
+            <th>Technician</th>
+            <th>Assigned Date and Time</th>
+            <th>Returned Date and Time</th>
+            <th>Repair Time</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody id="recordsBody">
+          <tr>
+            <td colspan="9">Loading records...</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </main>
 
   <script>
-    const db = window.supabase.createClient(
-      'https://ohvplvdxflmgqoptwftk.supabase.co',
-      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH',
-      { auth: { experimental: { passkey: true } } }
-    );
+    const SUPABASE_URL = "https://ohvplvdxflmgqoptwftk.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH";
 
-    let selectedStockIn = null;
-    let selectedRepair = null;
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        experimental: {
+          passkey: true
+        }
+      }
+    });
 
-    const defaultTechnicians = ['Select Technician'];
+    let selectedAssignPhone = null;
+    let selectedAssignRepair = null;
+    let selectedReturnPhone = null;
+    let selectedReturnRepair = null;
+    let selectedLabRecord = null;
 
-    function normalize(value) {
-      return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    function setStatus(message, type = '') {
-      const status = document.getElementById('status');
-      status.className = type;
-      status.textContent = message;
+    function formatDateTime(dateValue) {
+      if (!dateValue) return "-";
+
+      return new Date(dateValue).toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+      });
     }
 
-    function formatDate(value) {
-      if (!value) return '';
-      const parts = value.split('-');
-      return parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : value;
+    function getMinutesBetween(start, end) {
+      const startTime = new Date(start).getTime();
+      const endTime = new Date(end).getTime();
+      return Math.max(0, Math.round((endTime - startTime) / 60000));
     }
 
-    async function loadTechnicians(selected = '') {
+    function formatMinutes(minutes) {
+      const value = Number(minutes || 0);
+      const hours = Math.floor(value / 60);
+      const remaining = value % 60;
+
+      if (hours > 0 && remaining > 0) {
+        return hours + "h " + remaining + "m";
+      }
+
+      if (hours > 0) {
+        return hours + "h";
+      }
+
+      return remaining + "m";
+    }
+
+    function showPanel(panel) {
+      document.getElementById("assignPanel").classList.remove("active");
+      document.getElementById("returnPanel").classList.remove("active");
+      document.getElementById("assignTab").classList.remove("active");
+      document.getElementById("returnTab").classList.remove("active");
+
+      if (panel === "assign") {
+        document.getElementById("assignPanel").classList.add("active");
+        document.getElementById("assignTab").classList.add("active");
+      } else {
+        document.getElementById("returnPanel").classList.add("active");
+        document.getElementById("returnTab").classList.add("active");
+      }
+    }
+
+    function showPhoneInfo(elementId, phone) {
+      document.getElementById(elementId).innerHTML = `
+        <div class="info-grid">
+          <div class="info-item"><strong>S.No</strong>${escapeHtml(phone.serial_no)}</div>
+          <div class="info-item"><strong>Model</strong>${escapeHtml(phone.model)}</div>
+          <div class="info-item"><strong>Storage / GB</strong>${escapeHtml(phone.storage || "-")}</div>
+          <div class="info-item"><strong>Color</strong>${escapeHtml(phone.color || "-")}</div>
+          <div class="info-item"><strong>Our Grade</strong>${escapeHtml(phone.our_grade)}</div>
+          <div class="info-item"><strong>IMEI</strong>${escapeHtml(phone.imei)}</div>
+        </div>
+      `;
+
+      document.getElementById(elementId).style.display = "block";
+    }
+
+    async function loadTechnicians() {
+      const select = document.getElementById("technician");
+
       const { data, error } = await db
-        .from('production_options')
-        .select('value')
-        .eq('category', 'technician')
-        .order('value');
+        .from("production_options")
+        .select("*")
+        .eq("category", "technician")
+        .order("value");
 
-      const values = [...defaultTechnicians, ...(error ? [] : (data || []).map(item => item.value))];
-      const unique = [...new Map(values.map(item => [normalize(item), item])).values()];
-
-      technician.innerHTML = unique
-        .map(value => `<option value="${value}">${value}</option>`)
-        .join('');
-
-      if (selected) technician.value = selected;
-    }
-
-    async function addTechnician() {
-      const value = prompt('Enter technician name:');
-
-      if (!value || !value.trim()) return;
-
-      const clean = value.trim();
-
-      const { error } = await db
-        .from('production_options')
-        .insert({
-          category: 'technician',
-          value: clean,
-          normalized_value: normalize(clean)
-        });
-
-      if (error && !error.message.toLowerCase().includes('duplicate')) {
-        setStatus(error.message, 'error');
+      if (error) {
+        select.innerHTML = '<option value="">No technicians available</option>';
         return;
       }
 
-      await loadTechnicians(clean);
-      setStatus('Technician added.', 'success');
+      const options = data || [];
+
+      if (!options.length) {
+        select.innerHTML = '<option value="">Select Technician</option>';
+        return;
+      }
+
+      select.innerHTML = '<option value="">Select Technician</option>' +
+        options.map(function(item) {
+          return '<option value="' + escapeHtml(item.value) + '">' + escapeHtml(item.value) + "</option>";
+        }).join("");
     }
 
-    async function deleteTechnician() {
-      const value = technician.value;
+    async function addTechnician() {
+      const name = prompt("Enter technician name:");
 
-      if (value === 'Select Technician') return;
-      if (!confirm(`Delete "${value}" from the technician list?`)) return;
-      if (!await verifyDeleteAccess()) return;
+      if (!name || !name.trim()) return;
+
+      const value = name.trim();
 
       const { error } = await db
-        .from('production_options')
-        .delete()
-        .eq('category', 'technician')
-        .eq('normalized_value', normalize(value));
+        .from("production_options")
+        .insert({
+          category: "technician",
+          value: value,
+          normalized_value: value.toLowerCase()
+        });
 
-      if (error) {
-        setStatus(error.message, 'error');
+      if (error && !error.message.toLowerCase().includes("duplicate")) {
+        alert(error.message);
         return;
       }
 
       await loadTechnicians();
-      setStatus('Technician deleted.', 'success');
+      document.getElementById("technician").value = value;
     }
 
-    function clearDetails() {
-      selectedStockIn = null;
-      selectedRepair = null;
+    async function deleteTechnician() {
+      const select = document.getElementById("technician");
+      const value = select.value;
 
-      ['serialNo','model','storage','color','ourGrade','imeiDisplay'].forEach(id => {
-        document.getElementById(id).textContent = '-';
-      });
+      if (!value) {
+        alert("Select a technician first.");
+        return;
+      }
 
-      workDone.value = '';
-      timeMinutes.value = '0';
-      result.value = 'Fixed';
-      saveButton.disabled = true;
+      const confirmation = prompt("Enter delete password:");
+
+      if (confirmation !== "1213") {
+        alert("Incorrect password.");
+        return;
+      }
+
+      const { error } = await db
+        .from("production_options")
+        .delete()
+        .eq("category", "technician")
+        .eq("value", value);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await loadTechnicians();
     }
 
-    function showDetails(record) {
-      serialNo.textContent = record.serial_no;
-      model.textContent = record.model;
-      storage.textContent = record.storage;
-      color.textContent = record.color;
-      ourGrade.textContent = record.our_grade;
-      imeiDisplay.textContent = record.imei;
-      saveButton.disabled = false;
-    }
+    async function findForAssignment() {
+      const imei = document.getElementById("assignImei").value.trim();
+      const status = document.getElementById("assignStatus");
 
-    async function findImei() {
-      const imei = scanImei.value.trim();
-
-      clearDetails();
+      status.textContent = "";
+      document.getElementById("assignForm").style.display = "none";
+      document.getElementById("assignPhoneInfo").style.display = "none";
 
       if (!imei) {
-        setStatus('Scan or enter an IMEI first.', 'error');
+        alert("Please scan or enter an IMEI.");
         return;
       }
 
       const { data: phone, error: phoneError } = await db
-        .from('quality_stock_in')
-        .select('*')
-        .eq('imei', imei)
+        .from("quality_stock_in")
+        .select("*")
+        .eq("imei", imei)
         .maybeSingle();
 
       if (phoneError || !phone) {
-        setStatus('This IMEI was not found in Stock In records.', 'error');
+        alert("Phone not found in Inventory Entry.");
         return;
       }
 
-      const { data: repairs, error: repairError } = await db
-        .from('repair_process_records')
-        .select('*')
-        .eq('stock_in_id', phone.id)
-        .in('status', ['Sent to Lab', 'Rework'])
-        .order('created_at', { ascending: false })
-        .limit(1);
+      const { data: repair } = await db
+        .from("repair_process_records")
+        .select("*")
+        .eq("stock_in_id", phone.id)
+        .in("status", ["Sent to Lab", "Rework"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      if (repairError) {
-        setStatus(repairError.message, 'error');
+      if (!repair) {
+        alert("This phone has not been sent to Lab from Repair Process.");
         return;
       }
 
-      if (!repairs || !repairs.length) {
-        setStatus('This phone has no pending Repair Process record.', 'error');
+      const { data: pendingLab } = await db
+        .from("lab_process_records")
+        .select("*")
+        .eq("repair_id", repair.id)
+        .eq("result", "Pending")
+        .maybeSingle();
+
+      if (pendingLab) {
+        alert("This phone is already assigned to a technician.");
         return;
       }
 
-      selectedStockIn = phone;
-      selectedRepair = repairs[0];
+      selectedAssignPhone = phone;
+      selectedAssignRepair = repair;
 
-      showDetails(phone);
-      setStatus('Repair record found. Enter lab details.', 'success');
+      showPhoneInfo("assignPhoneInfo", phone);
+      document.getElementById("assignForm").style.display = "block";
+      document.getElementById("technician").focus();
     }
 
-    async function addToDailyProduction(phone) {
-      const today = labDate.value;
-      const { data: allRecords, error } = await db
-        .from('production_records')
-        .select('*')
-        .order('record_date', { ascending: true });
+    async function assignToTechnician() {
+      const technician = document.getElementById("technician").value;
+      const status = document.getElementById("assignStatus");
 
-      if (error) throw error;
-
-      const records = allRecords || [];
-
-      const same = record =>
-        normalize(record.model) === normalize(phone.model) &&
-        normalize(record.storage) === normalize(phone.storage) &&
-        normalize(record.color) === normalize(phone.color) &&
-        normalize(record.grade) === normalize(phone.our_grade);
-
-      const previous = records
-        .filter(record => record.record_date < today && same(record))
-        .sort((a, b) => b.record_date.localeCompare(a.record_date))[0];
-
-      const opening = previous ? Number(previous.closing_stock) || 0 : 0;
-
-      const old = records.find(record => record.record_date === today && same(record));
-
-      if (old) {
-        const production = (Number(old.production) || 0) + 1;
-        const exportQty = Number(old.export_qty) || 0;
-
-        const { error: updateError } = await db
-          .from('production_records')
-          .update({
-            production: production,
-            export_qty: exportQty,
-            opening_stock: Number(old.opening_stock) || opening,
-            closing_stock: (Number(old.opening_stock) || opening) + production - exportQty
-          })
-          .eq('id', old.id);
-
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await db
-          .from('production_records')
-          .insert({
-            record_date: today,
-            model: phone.model,
-            storage: phone.storage,
-            color: phone.color,
-            grade: phone.our_grade,
-            production: 1,
-            export_qty: 0,
-            opening_stock: opening,
-            closing_stock: opening + 1
-          });
-
-        if (insertError) throw insertError;
-      }
-    }
-
-    async function saveLabProcess() {
-      if (!selectedStockIn || !selectedRepair) {
-        setStatus('Scan an IMEI first.', 'error');
+      if (!selectedAssignPhone || !selectedAssignRepair) {
+        alert("Please scan an IMEI first.");
         return;
       }
 
-      if (technician.value === 'Select Technician') {
-        setStatus('Select a technician.', 'error');
+      if (!technician) {
+        alert("Please select a technician.");
         return;
       }
 
-      if (!workDone.value.trim()) {
-        setStatus('Enter work done details.', 'error');
-        return;
-      }
-
-      const labResult = result.value;
+      const now = new Date().toISOString();
 
       const { error } = await db
-        .from('lab_process_records')
+        .from("lab_process_records")
         .insert({
-          repair_id: selectedRepair.id,
-          lab_date: labDate.value,
-          technician: technician.value,
-          work_done: workDone.value.trim(),
-          time_minutes: Number(timeMinutes.value) || 0,
-          result: labResult
+          repair_id: selectedAssignRepair.id,
+          lab_date: now.slice(0, 10),
+          technician: technician,
+          work_done: "Pending",
+          time_minutes: 0,
+          result: "Pending",
+          assigned_at: now
         });
 
       if (error) {
-        setStatus(error.message, 'error');
+        alert(error.message);
         return;
       }
 
-      const { error: repairUpdateError } = await db
-        .from('repair_process_records')
-        .update({ status: labResult === 'Fixed' ? 'Fixed' : 'Rework' })
-        .eq('id', selectedRepair.id);
+      status.textContent = "Phone assigned successfully at " + formatDateTime(now) + ".";
+      document.getElementById("assignImei").value = "";
+      document.getElementById("assignForm").style.display = "none";
+      document.getElementById("assignPhoneInfo").style.display = "none";
+      selectedAssignPhone = null;
+      selectedAssignRepair = null;
 
-      if (repairUpdateError) {
-        setStatus(repairUpdateError.message, 'error');
-        return;
-      }
-
-      try {
-        if (labResult === 'Fixed') {
-          await addToDailyProduction(selectedStockIn);
-          setStatus('Phone fixed and added to Daily Production.', 'success');
-        } else {
-          setStatus('Phone marked for Rework.', 'success');
-        }
-      } catch (error) {
-        setStatus(`Lab record saved, but production update failed: ${error.message}`, 'error');
-        return;
-      }
-
-      scanImei.value = '';
-      clearDetails();
-      await loadRecords();
-      scanImei.focus();
+      loadLabRecords();
     }
 
-    async function loadRecords() {
-      const { data, error } = await db
-        .from('lab_process_records')
+    async function findForReturn() {
+      const imei = document.getElementById("returnImei").value.trim();
+
+      document.getElementById("returnStatus").textContent = "";
+      document.getElementById("returnForm").style.display = "none";
+      document.getElementById("returnPhoneInfo").style.display = "none";
+
+      if (!imei) {
+        alert("Please scan or enter an IMEI.");
+        return;
+      }
+
+      const { data: phone, error: phoneError } = await db
+        .from("quality_stock_in")
+        .select("*")
+        .eq("imei", imei)
+        .maybeSingle();
+
+      if (phoneError || !phone) {
+        alert("Phone not found in Inventory Entry.");
+        return;
+      }
+
+      const { data: repair } = await db
+        .from("repair_process_records")
+        .select("*")
+        .eq("stock_in_id", phone.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!repair) {
+        alert("Repair Process record not found.");
+        return;
+      }
+
+      const { data: labRecord } = await db
+        .from("lab_process_records")
+        .select("*")
+        .eq("repair_id", repair.id)
+        .eq("result", "Pending")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!labRecord) {
+        alert("No pending Lab assignment found for this phone.");
+        return;
+      }
+
+      selectedReturnPhone = phone;
+      selectedReturnRepair = repair;
+      selectedLabRecord = labRecord;
+
+      const now = new Date();
+      const assignedAt = labRecord.assigned_at || labRecord.created_at;
+      const repairMinutes = getMinutesBetween(assignedAt, now.toISOString());
+
+      showPhoneInfo("returnPhoneInfo", phone);
+
+      document.getElementById("assignedDateTime").value = formatDateTime(assignedAt);
+      document.getElementById("returnedDateTime").value = formatDateTime(now.toISOString());
+      document.getElementById("returnedTechnician").value = labRecord.technician;
+      document.getElementById("repairTime").value = formatMinutes(repairMinutes);
+      document.getElementById("workDone").value = "";
+      document.getElementById("result").value = "Fixed";
+      document.getElementById("returnForm").style.display = "block";
+      document.getElementById("workDone").focus();
+    }
+
+    async function completeLabProcess() {
+      const workDone = document.getElementById("workDone").value.trim();
+      const result = document.getElementById("result").value;
+      const status = document.getElementById("returnStatus");
+
+      if (!selectedLabRecord || !selectedReturnRepair) {
+        alert("Please scan an IMEI first.");
+        return;
+      }
+
+      if (!workDone) {
+        alert("Please enter work done.");
+        return;
+      }
+
+      const returnedAt = new Date().toISOString();
+      const assignedAt = selectedLabRecord.assigned_at || selectedLabRecord.created_at;
+      const timeMinutes = getMinutesBetween(assignedAt, returnedAt);
+
+      const { error: labError } = await db
+        .from("lab_process_records")
+        .update({
+          work_done: workDone,
+          result: result,
+          time_minutes: timeMinutes,
+          returned_at: returnedAt
+        })
+        .eq("id", selectedLabRecord.id);
+
+      if (labError) {
+        alert(labError.message);
+        return;
+      }
+
+      const repairStatus = result === "Fixed" ? "Fixed" : "Rework";
+
+      const { error: repairError } = await db
+        .from("repair_process_records")
+        .update({
+          status: repairStatus
+        })
+        .eq("id", selectedReturnRepair.id);
+
+      if (repairError) {
+        alert(repairError.message);
+        return;
+      }
+
+      if (result === "Fixed") {
+        await addToDailyProduction(selectedReturnPhone, returnedAt);
+      }
+
+      status.textContent =
+        "Return saved successfully. Total repair time: " + formatMinutes(timeMinutes) + ".";
+
+      document.getElementById("returnImei").value = "";
+      document.getElementById("returnForm").style.display = "none";
+      document.getElementById("returnPhoneInfo").style.display = "none";
+
+      selectedReturnPhone = null;
+      selectedReturnRepair = null;
+      selectedLabRecord = null;
+
+      loadLabRecords();
+    }
+
+    async function addToDailyProduction(phone, returnedAt) {
+      const date = returnedAt.slice(0, 10);
+
+      const { data: existingRecord } = await db
+        .from("production_records")
+        .select("*")
+        .eq("date", date)
+        .eq("model", phone.model)
+        .eq("storage", phone.storage || "-")
+        .eq("color", phone.color || "-")
+        .eq("grade", phone.our_grade)
+        .maybeSingle();
+
+      if (existingRecord) {
+        await db
+          .from("production_records")
+          .update({
+            production: (Number(existingRecord.production) || 0) + 1
+          })
+          .eq("id", existingRecord.id);
+      } else {
+        await db
+          .from("production_records")
+          .insert({
+            date: date,
+            model: phone.model,
+            storage: phone.storage || "-",
+            color: phone.color || "-",
+            grade: phone.our_grade,
+            production: 1,
+            export_qty: 0
+          });
+      }
+    }
+
+    async function loadLabRecords() {
+      const body = document.getElementById("recordsBody");
+
+      const { data: records, error } = await db
+        .from("lab_process_records")
         .select(`
           *,
           repair_process_records (
+            stock_in_id,
             quality_stock_in (
               serial_no,
               model,
+              storage,
               imei
             )
           )
         `)
-        .order('created_at', { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(100);
 
       if (error) {
-        setStatus(error.message, 'error');
+        body.innerHTML = '<tr><td colspan="9">Unable to load records.</td></tr>';
         return;
       }
 
-      records.innerHTML = (data || [])
-        .map(record => {
-          const phone = record.repair_process_records?.quality_stock_in || {};
-
-          return `
-            <tr>
-              <td>${formatDate(record.lab_date)}</td>
-              <td>${phone.serial_no || '-'}</td>
-              <td>${phone.model || '-'}</td>
-              <td>${phone.imei || '-'}</td>
-              <td>${record.technician}</td>
-              <td>${record.work_done}</td>
-              <td>${record.time_minutes} min</td>
-              <td>${record.result}</td>
-              <td><button class="delete-btn" onclick="deleteRecord('${record.id}')">Delete</button></td>
-            </tr>
-          `;
-        })
-        .join('');
-    }
-
-    async function verifyDeleteAccess() {
-      const { data: userData } = await db.auth.getUser();
-      const user = userData.user;
-
-      if (!user) return false;
-
-      const { data: passkeys, error: passkeyError } = await db.auth.passkey.list();
-
-      if (!passkeyError && (!passkeys || !passkeys.length)) {
-        const { error } = await db.auth.registerPasskey();
-        if (!error) return true;
-      }
-
-      if (!passkeyError && passkeys && passkeys.length) {
-        const { error } = await db.auth.signInWithPasskey();
-        if (!error) return true;
-      }
-
-      const password = prompt('Face verification unavailable. Enter your account password:');
-
-      if (!password) return false;
-
-      const { error } = await db.auth.signInWithPassword({
-        email: user.email,
-        password: password
-      });
-
-      return !error;
-    }
-
-    async function deleteRecord(id) {
-      if (!confirm('Delete this Lab Process record?')) return;
-      if (!await verifyDeleteAccess()) return;
-
-      const { error } = await db
-        .from('lab_process_records')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        setStatus(error.message, 'error');
+      if (!records || !records.length) {
+        body.innerHTML = '<tr><td colspan="9">No Lab records found.</td></tr>';
         return;
       }
 
-      setStatus('Lab Process record deleted.', 'success');
-      await loadRecords();
+      body.innerHTML = records.map(function(record) {
+        const phone = record.repair_process_records &&
+          record.repair_process_records.quality_stock_in
+          ? record.repair_process_records.quality_stock_in
+          : {};
+
+        let resultClass = "pending";
+
+        if (record.result === "Fixed") resultClass = "fixed";
+        if (record.result === "Rework") resultClass = "rework";
+
+        return `
+          <tr>
+            <td>${escapeHtml(phone.serial_no || "-")}</td>
+            <td>${escapeHtml(phone.model || "-")}</td>
+            <td>${escapeHtml(phone.storage || "-")}</td>
+            <td>${escapeHtml(phone.imei || "-")}</td>
+            <td>${escapeHtml(record.technician)}</td>
+            <td>${formatDateTime(record.assigned_at || record.created_at)}</td>
+            <td>${formatDateTime(record.returned_at)}</td>
+            <td>${record.result === "Pending" ? "-" : formatMinutes(record.time_minutes)}</td>
+            <td class="${resultClass}">${escapeHtml(record.result)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function goBack() {
+      if (history.length > 1) {
+        history.back();
+      } else {
+        location.href = "quality-control.html";
+      }
     }
 
     async function logout() {
       await db.auth.signOut();
-      window.location.href = 'index.html';
+      location.href = "index.html";
     }
 
-    db.auth.getSession().then(result => {
-      if (!result.data.session) window.location.href = 'index.html';
-    });
+    async function checkLogin() {
+      const {
+        data: { session }
+      } = await db.auth.getSession();
 
-    labDate.valueAsDate = new Date();
+      if (!session) {
+        location.href = "index.html";
+        return;
+      }
 
-    scanImei.addEventListener('keydown', event => {
-      if (event.key === 'Enter') {
+      await loadTechnicians();
+      await loadLabRecords();
+    }
+
+    document.getElementById("assignImei").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
         event.preventDefault();
-        findImei();
+        findForAssignment();
       }
     });
 
-    loadTechnicians();
-    loadRecords();
+    document.getElementById("returnImei").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        findForReturn();
+      }
+    });
 
-    setTimeout(() => scanImei.focus(), 700);
+    checkLogin();
   </script>
 </body>
 </html>
