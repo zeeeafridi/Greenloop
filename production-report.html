@@ -4,41 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Production Reports | Greenloop FZC</title>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { margin: 0; background: #f3f7f4; color: #163d2d; }
-    header { display: flex; align-items: center; gap: 12px; padding: 14px 8%; background: #0b5b38; color: white; font-size: 22px; font-weight: bold; }
-    .logo { width: 55px; height: 42px; object-fit: contain; }
-    nav { padding: 14px 8%; display: flex; gap: 12px; flex-wrap: wrap; background: #e5f3ea; }
-    nav a { padding: 10px 16px; color: #0b5b38; background: white; border-radius: 7px; text-decoration: none; font-weight: bold; }
-    main { max-width: 1300px; margin: auto; padding: 35px 20px; }
-    .box { margin-top: 25px; padding: 25px; border-radius: 14px; background: white; box-shadow: 0 4px 18px rgba(0,0,0,.08); overflow-x: auto; }
-    .filters { display: flex; gap: 15px; align-items: end; flex-wrap: wrap; }
-    label { display: block; margin-bottom: 7px; font-weight: bold; }
-    input { padding: 11px; border: 1px solid #cfd8d2; border-radius: 8px; font-size: 15px; }
-    button { padding: 12px 20px; border: none; border-radius: 8px; background: #168653; color: white; font-weight: bold; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    th, td { padding: 12px; border-bottom: 1px solid #e2e7e4; text-align: center; }
-    th { background: #0b5b38; color: white; }
-    tfoot td { background: #e7f5ec; font-weight: bold; }
-    .bulges-title { color: #9b5d00; }
-    .error { margin-top: 14px; color: #d84343; font-weight: bold; }
+    *{box-sizing:border-box;font-family:Arial,sans-serif}
+    body{margin:0;background:#f3f7f4;color:#163d2d}
+    header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}
+    .header-logo{width:55px;height:42px;object-fit:contain}
+    .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}
+    .top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
+    main{max-width:1350px;margin:auto;padding:35px 20px}
+    .box{margin-top:25px;padding:25px;border-radius:14px;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.08);overflow-x:auto}
+    .filters{display:flex;gap:15px;align-items:end;flex-wrap:wrap}
+    label{display:block;margin-bottom:7px;font-weight:bold}
+    input{padding:11px;border:1px solid #cfd8d2;border-radius:8px;font-size:15px}
+    button{padding:12px 20px;border:0;border-radius:8px;background:#168653;color:#fff;font-weight:bold;cursor:pointer}
+    table{width:100%;border-collapse:collapse;margin-top:15px;min-width:850px}
+    th,td{padding:12px;border-bottom:1px solid #e2e7e4;text-align:center}
+    th{background:#0b5b38;color:#fff}
+    td:first-child,th:first-child{text-align:left}
+    tfoot td{background:#e7f5ec;font-weight:bold}
+    .status{margin-top:12px;font-weight:bold}
   </style>
 </head>
 
 <body>
   <header>
-    <img src="looplogo.jpg" alt="Greenloop Logo" class="logo">
+    <img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">
     Greenloop FZC
   </header>
 
-  <nav>
-    <a href="daily-production.html">← Daily Production</a>
-    <a href="dashboard.html">⌂ Dashboard</a>
+  <nav class="top-nav">
+    <a href="javascript:history.back()">Back</a>
+    <a href="daily-production.html">Daily Production</a>
+    <a href="dashboard.html">Dashboard</a>
     <a href="index.html">Home / Login</a>
+    <a href="#" onclick="logout();return false;">Logout</a>
   </nav>
 
   <main>
@@ -48,18 +49,18 @@
       <div class="filters">
         <div>
           <label>From Date</label>
-          <input type="text" id="fromDate" placeholder="DD/MM/YYYY">
+          <input type="date" id="fromDate">
         </div>
 
         <div>
           <label>To Date</label>
-          <input type="text" id="toDate" placeholder="DD/MM/YYYY">
+          <input type="date" id="toDate">
         </div>
 
         <button onclick="showReport()">Show Report</button>
       </div>
 
-      <div id="errorMessage" class="error"></div>
+      <div class="status" id="status"></div>
     </div>
 
     <div class="box">
@@ -77,14 +78,13 @@
             <th>Total Stock</th>
           </tr>
         </thead>
-
-        <tbody id="mainRows"></tbody>
-        <tfoot id="mainTotals"></tfoot>
+        <tbody id="stockTable"></tbody>
+        <tfoot id="stockTotals"></tfoot>
       </table>
     </div>
 
     <div class="box">
-      <h2 class="bulges-title">Bulges Stock Summary</h2>
+      <h2>Bulges Stock Summary</h2>
 
       <table>
         <thead>
@@ -97,8 +97,7 @@
             <th>Total Bulges</th>
           </tr>
         </thead>
-
-        <tbody id="bulgesRows"></tbody>
+        <tbody id="bulgesTable"></tbody>
         <tfoot id="bulgesTotals"></tfoot>
       </table>
     </div>
@@ -117,277 +116,328 @@
             <th>Stock Balance</th>
           </tr>
         </thead>
-
-        <tbody id="dailyRows"></tbody>
+        <tbody id="detailsTable"></tbody>
+        <tfoot id="productionTotals"></tfoot>
       </table>
     </div>
   </main>
 
   <script>
     const db = window.supabase.createClient(
-      "https://ohvplvdxflmgqoptwftk.supabase.co",
-      "sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH"
+      'https://ohvplvdxflmgqoptwftk.supabase.co',
+      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH'
     );
 
-    function formatDate(isoDate) {
-      const parts = isoDate.split("-");
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-
-    function convertDate(value) {
-      if (!value) return null;
-
-      const parts = value.split("/");
-
-      if (parts.length !== 3) return null;
-
-      const day = parts[0].padStart(2, "0");
-      const month = parts[1].padStart(2, "0");
-      const year = parts[2];
-
-      if (day.length !== 2 || month.length !== 2 || year.length !== 4) {
-        return null;
-      }
-
-      return `${year}-${month}-${day}`;
-    }
-
-    function todayDate() {
-      const today = new Date();
-
-      return `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
+    function setStatus(message, error = false) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.style.color = error ? '#c43838' : '#0b6e42';
     }
 
     function isBulges(record) {
-      return record.grade === "Bulges A" || record.grade === "Bulges B";
+      const grade = String(record.grade || '').trim().toLowerCase();
+
+      return grade === 'bulges a' || grade === 'bulges b';
+    }
+
+    function formatDate(date) {
+      const parts = String(date).split('-');
+
+      return parts.length === 3
+        ? `${parts[2]}-${parts[1]}-${parts[0]}`
+        : date;
+    }
+
+    function recordKey(record) {
+      return [
+        record.model,
+        record.storage,
+        record.color,
+        record.grade
+      ].join('|').toLowerCase();
     }
 
     function getBalanceOnDate(records, date) {
-      const latestByItem = {};
+      const latest = {};
 
       records
-        .filter(function(record) {
-          return record.record_date <= date && !isBulges(record);
-        })
-        .forEach(function(record) {
-          const key = [
-            record.model,
-            record.storage,
-            record.color,
-            record.grade
-          ].join("|").toLowerCase();
+        .filter(record => record.record_date <= date)
+        .forEach(record => {
+          const key = recordKey(record);
 
-          if (
-            !latestByItem[key] ||
-            latestByItem[key].record_date <= record.record_date
-          ) {
-            latestByItem[key] = record;
+          if (!latest[key] || latest[key].record_date <= record.record_date) {
+            latest[key] = record;
           }
         });
 
-      return Object.values(latestByItem).reduce(function(total, record) {
-        return total + (Number(record.closing_stock) || 0);
-      }, 0);
+      return Object.values(latest)
+        .filter(record => !isBulges(record))
+        .reduce((total, record) => total + (Number(record.closing_stock) || 0), 0);
     }
 
     async function showReport() {
-      const errorMessage = document.getElementById("errorMessage");
-      errorMessage.textContent = "";
+      const from = fromDate.value || '0000-01-01';
+      const to = toDate.value || '9999-12-31';
 
-      const fromDate = convertDate(document.getElementById("fromDate").value);
-      const toDate = convertDate(document.getElementById("toDate").value);
-
-      if (!fromDate || !toDate) {
-        errorMessage.textContent = "Please use date format DD/MM/YYYY.";
-        return;
-      }
+      setStatus('Loading report...');
 
       const { data, error } = await db
-        .from("production_records")
-        .select("*")
-        .order("record_date", { ascending: true });
+        .from('production_records')
+        .select('*')
+        .order('record_date', { ascending: true });
 
       if (error) {
-        errorMessage.textContent = error.message;
+        setStatus(error.message, true);
         return;
       }
 
       const allRecords = data || [];
+      const nonBulgesRecords = allRecords.filter(record => !isBulges(record));
+      const bulgesRecords = allRecords.filter(record => isBulges(record));
 
-      const nonBulgesRecords = allRecords.filter(function(record) {
-        return !isBulges(record);
-      });
+      buildStockSummary(nonBulgesRecords, to);
+      buildBulgesSummary(bulgesRecords, to);
+      buildDateWiseReport(nonBulgesRecords, from, to);
 
-      const dailyData = {};
+      setStatus('Report updated.');
+    }
 
-      nonBulgesRecords.forEach(function(record) {
-        if (!dailyData[record.record_date]) {
-          dailyData[record.record_date] = {
-            date: record.record_date,
-            production: 0,
-            exportQty: 0
-          };
-        }
+    function buildStockSummary(records, toDate) {
+      const latest = {};
 
-        dailyData[record.record_date].production += Number(record.production) || 0;
-        dailyData[record.record_date].exportQty += Number(record.export_qty) || 0;
-      });
+      records
+        .filter(record => record.record_date <= toDate)
+        .forEach(record => {
+          const key = recordKey(record);
 
-      const allDates = Object.keys(dailyData).sort();
-
-      let accumulatedProduction = 0;
-      let productionDays = 0;
-
-      const dateReport = [];
-
-      allDates.forEach(function(date) {
-        accumulatedProduction += dailyData[date].production;
-        productionDays += 1;
-
-        if (date >= fromDate && date <= toDate) {
-          dateReport.push({
-            date: date,
-            todayProduction: dailyData[date].production,
-            totalProduction: accumulatedProduction,
-            todayExport: dailyData[date].exportQty,
-            averageProduction: accumulatedProduction / productionDays,
-            balance: getBalanceOnDate(allRecords, date)
-          });
-        }
-      });
-
-      document.getElementById("dailyRows").innerHTML = dateReport
-        .sort(function(a, b) {
-          return b.date.localeCompare(a.date);
-        })
-        .map(function(item) {
-          return `
-            <tr>
-              <td>${formatDate(item.date)}</td>
-              <td>${item.todayProduction}</td>
-              <td>${item.totalProduction}</td>
-              <td>${item.todayExport}</td>
-              <td>${item.averageProduction.toFixed(2)}</td>
-              <td><strong>${item.balance}</strong></td>
-            </tr>
-          `;
-        }).join("");
-
-      const latestRecords = {};
-
-      allRecords
-        .filter(function(record) {
-          return record.record_date <= toDate;
-        })
-        .forEach(function(record) {
-          const key = [
-            record.model,
-            record.storage,
-            record.color,
-            record.grade
-          ].join("|").toLowerCase();
-
-          if (
-            !latestRecords[key] ||
-            latestRecords[key].record_date <= record.record_date
-          ) {
-            latestRecords[key] = record;
+          if (!latest[key] || latest[key].record_date <= record.record_date) {
+            latest[key] = record;
           }
         });
 
-      const stockSummary = {};
+      const summary = {};
 
-      Object.values(latestRecords).forEach(function(record) {
+      Object.values(latest).forEach(record => {
         const key = [
           record.model,
           record.storage,
           record.color
-        ].join("|").toLowerCase();
+        ].join('|').toLowerCase();
 
-        if (!stockSummary[key]) {
-          stockSummary[key] = {
+        if (!summary[key]) {
+          summary[key] = {
             model: record.model,
             storage: record.storage,
             color: record.color,
             a: 0,
             b: 0,
-            rma: 0,
+            rma: 0
+          };
+        }
+
+        const quantity = Number(record.closing_stock) || 0;
+        const grade = String(record.grade || '').trim().toLowerCase();
+
+        if (grade === 'a') summary[key].a += quantity;
+        if (grade === 'b') summary[key].b += quantity;
+        if (grade === 'rma') summary[key].rma += quantity;
+      });
+
+      let totalA = 0;
+      let totalB = 0;
+      let totalRma = 0;
+
+      stockTable.innerHTML = Object.values(summary)
+        .map(item => {
+          totalA += item.a;
+          totalB += item.b;
+          totalRma += item.rma;
+
+          return `
+            <tr>
+              <td>${item.model}</td>
+              <td>${item.storage}</td>
+              <td>${item.color}</td>
+              <td>${item.a}</td>
+              <td>${item.b}</td>
+              <td>${item.rma}</td>
+              <td><strong>${item.a + item.b + item.rma}</strong></td>
+            </tr>
+          `;
+        })
+        .join('');
+
+      stockTotals.innerHTML = `
+        <tr>
+          <td colspan="3">Grand Total</td>
+          <td>${totalA}</td>
+          <td>${totalB}</td>
+          <td>${totalRma}</td>
+          <td>${totalA + totalB + totalRma}</td>
+        </tr>
+      `;
+    }
+
+    function buildBulgesSummary(records, toDate) {
+      const latest = {};
+
+      records
+        .filter(record => record.record_date <= toDate)
+        .forEach(record => {
+          const key = recordKey(record);
+
+          if (!latest[key] || latest[key].record_date <= record.record_date) {
+            latest[key] = record;
+          }
+        });
+
+      const summary = {};
+
+      Object.values(latest).forEach(record => {
+        const key = [
+          record.model,
+          record.storage,
+          record.color
+        ].join('|').toLowerCase();
+
+        if (!summary[key]) {
+          summary[key] = {
+            model: record.model,
+            storage: record.storage,
+            color: record.color,
             bulgesA: 0,
             bulgesB: 0
           };
         }
 
-        const stock = Number(record.closing_stock) || 0;
+        const quantity = Number(record.closing_stock) || 0;
+        const grade = String(record.grade || '').trim().toLowerCase();
 
-        if (record.grade === "A") stockSummary[key].a += stock;
-        if (record.grade === "B") stockSummary[key].b += stock;
-        if (record.grade === "RMA") stockSummary[key].rma += stock;
-        if (record.grade === "Bulges A") stockSummary[key].bulgesA += stock;
-        if (record.grade === "Bulges B") stockSummary[key].bulgesB += stock;
+        if (grade === 'bulges a') summary[key].bulgesA += quantity;
+        if (grade === 'bulges b') summary[key].bulgesB += quantity;
       });
 
       let totalA = 0;
       let totalB = 0;
-      let totalRMA = 0;
-      let totalBulgesA = 0;
-      let totalBulgesB = 0;
 
-      document.getElementById("mainRows").innerHTML = "";
-      document.getElementById("bulgesRows").innerHTML = "";
+      bulgesTable.innerHTML = Object.values(summary)
+        .map(item => {
+          totalA += item.bulgesA;
+          totalB += item.bulgesB;
 
-      Object.values(stockSummary).forEach(function(item) {
-        totalA += item.a;
-        totalB += item.b;
-        totalRMA += item.rma;
-        totalBulgesA += item.bulgesA;
-        totalBulgesB += item.bulgesB;
+          return `
+            <tr>
+              <td>${item.model}</td>
+              <td>${item.storage}</td>
+              <td>${item.color}</td>
+              <td>${item.bulgesA}</td>
+              <td>${item.bulgesB}</td>
+              <td><strong>${item.bulgesA + item.bulgesB}</strong></td>
+            </tr>
+          `;
+        })
+        .join('');
 
-        document.getElementById("mainRows").innerHTML += `
-          <tr>
-            <td>${item.model}</td>
-            <td>${item.storage}</td>
-            <td>${item.color}</td>
-            <td>${item.a}</td>
-            <td>${item.b}</td>
-            <td>${item.rma}</td>
-            <td><strong>${item.a + item.b + item.rma}</strong></td>
-          </tr>
-        `;
-
-        document.getElementById("bulgesRows").innerHTML += `
-          <tr>
-            <td>${item.model}</td>
-            <td>${item.storage}</td>
-            <td>${item.color}</td>
-            <td>${item.bulgesA}</td>
-            <td>${item.bulgesB}</td>
-            <td><strong>${item.bulgesA + item.bulgesB}</strong></td>
-          </tr>
-        `;
-      });
-
-      document.getElementById("mainTotals").innerHTML = `
+      bulgesTotals.innerHTML = `
         <tr>
           <td colspan="3">Grand Total</td>
           <td>${totalA}</td>
           <td>${totalB}</td>
-          <td>${totalRMA}</td>
-          <td>${totalA + totalB + totalRMA}</td>
-        </tr>
-      `;
-
-      document.getElementById("bulgesTotals").innerHTML = `
-        <tr>
-          <td colspan="3">Grand Total</td>
-          <td>${totalBulgesA}</td>
-          <td>${totalBulgesB}</td>
-          <td>${totalBulgesA + totalBulgesB}</td>
+          <td>${totalA + totalB}</td>
         </tr>
       `;
     }
 
-    document.getElementById("fromDate").value = "01/01/2020";
-    document.getElementById("toDate").value = todayDate();
+    function buildDateWiseReport(records, fromDate, toDate) {
+      const dates = [...new Set(records.map(record => record.record_date))]
+        .sort();
+
+      const daily = {};
+
+      dates.forEach(date => {
+        daily[date] = {
+          production: 0,
+          exportQty: 0
+        };
+      });
+
+      records.forEach(record => {
+        daily[record.record_date].production += Number(record.production) || 0;
+        daily[record.record_date].exportQty += Number(record.export_qty) || 0;
+      });
+
+      let cumulativeProduction = 0;
+      let cumulativeExport = 0;
+      let productionDays = 0;
+      const rows = [];
+
+      dates.forEach(date => {
+        const todayProduction = daily[date].production;
+        const todayExport = daily[date].exportQty;
+
+        cumulativeProduction += todayProduction;
+        cumulativeExport += todayExport;
+
+        if (todayProduction > 0) {
+          productionDays += 1;
+        }
+
+        if (date >= fromDate && date <= toDate) {
+          rows.push({
+            date: date,
+            todayProduction: todayProduction,
+            totalProduction: cumulativeProduction,
+            todayExport: todayExport,
+            averageProduction: productionDays
+              ? Math.round(cumulativeProduction / productionDays)
+              : 0,
+            balance: getBalanceOnDate(records, date)
+          });
+        }
+      });
+
+      detailsTable.innerHTML = rows
+        .map(row => `
+          <tr>
+            <td>${formatDate(row.date)}</td>
+            <td>${row.todayProduction}</td>
+            <td>${row.totalProduction}</td>
+            <td>${row.todayExport}</td>
+            <td>${row.averageProduction}</td>
+            <td><strong>${row.balance}</strong></td>
+          </tr>
+        `)
+        .join('');
+
+      const lastRow = rows.length ? rows[rows.length - 1] : null;
+
+      productionTotals.innerHTML = lastRow
+        ? `
+          <tr>
+            <td>Grand Total</td>
+            <td>${rows.reduce((sum, row) => sum + row.todayProduction, 0)}</td>
+            <td>${lastRow.totalProduction}</td>
+            <td>${rows.reduce((sum, row) => sum + row.todayExport, 0)}</td>
+            <td>${lastRow.averageProduction}</td>
+            <td>${lastRow.balance}</td>
+          </tr>
+        `
+        : '';
+    }
+
+    async function logout() {
+      await db.auth.signOut();
+      window.location.href = 'index.html';
+    }
+
+    db.auth.getSession().then(function(result) {
+      if (!result.data.session) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    fromDate.value = '2020-01-01';
+    toDate.valueAsDate = new Date();
 
     showReport();
   </script>
