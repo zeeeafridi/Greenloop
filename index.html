@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Greenloop FZC</title>
+  <title>Greenloop FZC Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -12,78 +13,100 @@
     }
 
     body {
-      margin: 0;
       min-height: 100vh;
+      margin: 0;
       display: flex;
-      justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #0b3d2e, #1e8c5a);
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #0b5b38, #168653);
     }
 
     .login-box {
-      width: 90%;
-      max-width: 420px;
-      padding: 42px 32px;
+      width: 100%;
+      max-width: 520px;
+      padding: 42px 48px;
+      border-radius: 24px;
       text-align: center;
       background: white;
-      border-radius: 18px;
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.22);
     }
 
     .logo {
-      width: 145px;
-      height: 95px;
+      width: 110px;
+      height: 90px;
       object-fit: contain;
-      margin: 0 auto 18px;
-      display: block;
+      margin-bottom: 18px;
     }
 
     h1 {
-      margin: 0;
-      color: #123f2e;
-      font-size: 29px;
+      margin: 0 0 10px;
+      color: #123c2b;
+      font-size: 35px;
     }
 
     p {
-      color: #777;
-      margin: 10px 0 28px;
+      margin: 0 0 28px;
+      color: #64756c;
+      font-size: 17px;
+    }
+
+    label {
+      display: block;
+      margin: 18px 0 7px;
+      text-align: left;
+      color: #123c2b;
+      font-weight: bold;
     }
 
     input {
       width: 100%;
       padding: 14px;
-      border: 1px solid #d5d5d5;
-      border-radius: 9px;
-      outline: none;
+      border: 1px solid #cfd8d2;
+      border-radius: 10px;
       font-size: 16px;
-    }
-
-    input:focus {
-      border-color: #25a96b;
     }
 
     button {
       width: 100%;
-      margin-top: 14px;
+      margin-top: 25px;
       padding: 14px;
-      border: none;
-      border-radius: 9px;
+      border: 0;
+      border-radius: 10px;
       background: #168653;
       color: white;
-      font-size: 16px;
-      font-weight: bold;
       cursor: pointer;
+      font-size: 17px;
+      font-weight: bold;
     }
 
-    button:hover {
-      background: #0f6e43;
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
     }
 
-    #error {
-      display: none;
-      margin-top: 15px;
-      color: #d52222;
-      font-size: 14px;
+    #status {
+      min-height: 22px;
+      margin-top: 16px;
+      font-weight: bold;
+    }
+
+    .error {
+      color: #c43838;
+    }
+
+    .success {
+      color: #0b6e42;
+    }
+
+    @media (max-width: 550px) {
+      .login-box {
+        padding: 35px 25px;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
     }
   </style>
 </head>
@@ -93,29 +116,97 @@
     <img src="looplogo.jpg" alt="Greenloop Logo" class="logo">
 
     <h1>Greenloop FZC</h1>
-    <p>Please enter your password to continue.</p>
+    <p>Sign in to continue.</p>
 
-    <form onsubmit="login(event)">
-      <input type="password" id="password" placeholder="Enter Password" required>
-      <button type="submit">Login</button>
+    <form id="loginForm">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="Enter email address" required autocomplete="email">
+
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+
+      <button type="submit" id="loginButton">Login</button>
     </form>
 
-    <div id="error">Incorrect password. Please try again.</div>
+    <div id="status"></div>
   </div>
 
   <script>
-    function login(event) {
-      event.preventDefault();
+    const db = window.supabase.createClient(
+      'https://ohvplvdxflmgqoptwftk.supabase.co',
+      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH',
+      {
+        auth: {
+          experimental: {
+            passkey: true
+          }
+        }
+      }
+    );
 
-      const password = document.getElementById("password").value;
-      const correctPassword = "1111";
+    function setStatus(message, type = '') {
+      const status = document.getElementById('status');
+      status.className = type;
+      status.textContent = message;
+    }
 
-      if (password === correctPassword) {
-        window.location.href = "dashboard.html";
-      } else {
-        document.getElementById("error").style.display = "block";
+    async function registerFacePasskeyIfNeeded() {
+      try {
+        const { data, error } = await db.auth.passkey.list();
+
+        if (error) return;
+
+        if (!data || !data.length) {
+          setStatus('Set up Windows Hello Face or PIN to protect delete actions.', 'success');
+
+          const { error: passkeyError } = await db.auth.registerPasskey();
+
+          if (passkeyError) {
+            setStatus('Login completed. Face verification can be set up later.', 'success');
+          }
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
+
+    async function login(event) {
+      event.preventDefault();
+
+      const button = document.getElementById('loginButton');
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      button.disabled = true;
+      setStatus('Signing in...');
+
+      const { error } = await db.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        button.disabled = false;
+        setStatus('Incorrect email or password.', 'error');
+        return;
+      }
+
+      await registerFacePasskeyIfNeeded();
+
+      setStatus('Login successful.', 'success');
+
+      setTimeout(function() {
+        window.location.href = 'dashboard.html';
+      }, 500);
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', login);
+
+    db.auth.getSession().then(function(result) {
+      if (result.data.session) {
+        window.location.href = 'dashboard.html';
+      }
+    });
   </script>
 </body>
 </html>
