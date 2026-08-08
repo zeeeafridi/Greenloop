@@ -3,147 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Production | Greenloop FZC</title>
+  <title>Production Reports | Greenloop FZC</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
-
-    body {
-      margin: 0;
-      background: #f3f7f4;
-      color: #163d2d;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 8%;
-      background: #0b5b38;
-      color: white;
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .logo {
-      width: 55px;
-      height: 42px;
-      object-fit: contain;
-    }
-
-    nav {
-      padding: 14px 8%;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      background: #e5f3ea;
-    }
-
-    nav a {
-      padding: 10px 16px;
-      color: #0b5b38;
-      background: white;
-      border-radius: 7px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    main {
-      max-width: 1200px;
-      margin: auto;
-      padding: 35px 20px;
-    }
-
-    .box {
-      margin-top: 25px;
-      padding: 25px;
-      border-radius: 14px;
-      background: white;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-      overflow-x: auto;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 18px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 7px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #cfd8d2;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .actions select {
-      flex: 1;
-    }
-
-    button {
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .add {
-      padding: 0 12px;
-      background: #0b5b38;
-      font-size: 20px;
-    }
-
-    .remove, .delete-btn {
-      padding: 7px 10px;
-      background: #d84343;
-    }
-
-    .save-btn {
-      margin-top: 24px;
-      padding: 13px 28px;
-      background: #168653;
-      font-size: 16px;
-    }
-
-    .info {
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 8px;
-      background: #e7f5ec;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-    }
-
-    th, td {
-      padding: 11px;
-      border-bottom: 1px solid #e2e7e4;
-      text-align: center;
-    }
-
-    th {
-      background: #0b5b38;
-      color: white;
-    }
+    body { margin: 0; background: #f3f7f4; color: #163d2d; }
+    header { display: flex; align-items: center; gap: 12px; padding: 14px 8%; background: #0b5b38; color: white; font-size: 22px; font-weight: bold; }
+    .logo { width: 55px; height: 42px; object-fit: contain; }
+    nav { padding: 14px 8%; display: flex; gap: 12px; flex-wrap: wrap; background: #e5f3ea; }
+    nav a { padding: 10px 16px; color: #0b5b38; background: white; border-radius: 7px; text-decoration: none; font-weight: bold; }
+    main { max-width: 1300px; margin: auto; padding: 35px 20px; }
+    .box { margin-top: 25px; padding: 25px; border-radius: 14px; background: white; box-shadow: 0 4px 18px rgba(0,0,0,.08); overflow-x: auto; }
+    .filters { display: flex; gap: 15px; align-items: end; flex-wrap: wrap; }
+    label { display: block; margin-bottom: 7px; font-weight: bold; }
+    input { padding: 11px; border: 1px solid #cfd8d2; border-radius: 8px; font-size: 15px; }
+    button { padding: 12px 20px; border: none; border-radius: 8px; background: #168653; color: white; font-weight: bold; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { padding: 12px; border-bottom: 1px solid #e2e7e4; text-align: center; }
+    th { background: #0b5b38; color: white; }
+    tfoot td { background: #e7f5ec; font-weight: bold; }
+    .bulges-title { color: #9b5d00; }
+    .error { margin-top: 14px; color: #d84343; font-weight: bold; }
   </style>
 </head>
 
@@ -154,81 +36,74 @@
   </header>
 
   <nav>
-    <a href="dashboard.html">← Dashboard</a>
-    <a href="index.html">⌂ Home / Login</a>
-    <a href="production-report.html">📊 Reports</a>
+    <a href="daily-production.html">← Daily Production</a>
+    <a href="dashboard.html">⌂ Dashboard</a>
+    <a href="index.html">Home / Login</a>
   </nav>
 
   <main>
-    <h1>Daily Production</h1>
-    <p>Enter production and export quantities.</p>
+    <h1>Daily Production Reports</h1>
 
     <div class="box">
-      <div class="form-grid">
+      <div class="filters">
         <div>
-          <label>Date</label>
-          <input type="date" id="date">
+          <label>From Date</label>
+          <input type="text" id="fromDate" placeholder="DD/MM/YYYY">
         </div>
 
         <div>
-          <label>Model</label>
-          <div class="actions">
-            <select id="model"></select>
-            <button class="add" type="button" onclick="addOption('model')">+</button>
-            <button class="remove" type="button" onclick="deleteOption('model')">−</button>
-          </div>
+          <label>To Date</label>
+          <input type="text" id="toDate" placeholder="DD/MM/YYYY">
         </div>
 
-        <div>
-          <label>Storage / GB</label>
-          <div class="actions">
-            <select id="storage"></select>
-            <button class="add" type="button" onclick="addOption('storage')">+</button>
-            <button class="remove" type="button" onclick="deleteOption('storage')">−</button>
-          </div>
-        </div>
-
-        <div>
-          <label>Color</label>
-          <div class="actions">
-            <select id="color"></select>
-            <button class="add" type="button" onclick="addOption('color')">+</button>
-            <button class="remove" type="button" onclick="deleteOption('color')">−</button>
-          </div>
-        </div>
-
-        <div>
-          <label>Grade</label>
-          <div class="actions">
-            <select id="grade"></select>
-            <button class="add" type="button" onclick="addOption('grade')">+</button>
-            <button class="remove" type="button" onclick="deleteOption('grade')">−</button>
-          </div>
-        </div>
-
-        <div>
-          <label>Produced Quantity</label>
-          <input type="number" id="productionQty" min="0" placeholder="Enter quantity">
-        </div>
-
-        <div>
-          <label>Export / Out Quantity</label>
-          <input type="number" id="exportQty" min="0" value="0">
-        </div>
+        <button onclick="showReport()">Show Report</button>
       </div>
 
-      <div class="info">
-        <strong>Calculated Day End Stock:</strong>
-        <span id="preview">0</span> units
-      </div>
-
-      <button class="save-btn" type="button" onclick="saveRecord()">
-        Save Daily Production
-      </button>
+      <div id="errorMessage" class="error"></div>
     </div>
 
     <div class="box">
-      <h2>Daily Production Records</h2>
+      <h2>Closing Stock Summary</h2>
+      <p>Grade A and Grade B only. Bulges are not included in this total.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>GB</th>
+            <th>Color</th>
+            <th>Grade A</th>
+            <th>Grade B</th>
+            <th>Total Stock</th>
+          </tr>
+        </thead>
+        <tbody id="mainRows"></tbody>
+        <tfoot id="mainTotals"></tfoot>
+      </table>
+    </div>
+
+    <div class="box">
+      <h2 class="bulges-title">Bulges Stock Summary</h2>
+      <p>Bulges are shown separately and are not included in Closing Stock Summary.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>GB</th>
+            <th>Color</th>
+            <th>Bulges A</th>
+            <th>Bulges B</th>
+            <th>Total Bulges</th>
+          </tr>
+        </thead>
+        <tbody id="bulgesRows"></tbody>
+        <tfoot id="bulgesTotals"></tfoot>
+      </table>
+    </div>
+
+    <div class="box">
+      <h2>Date-wise Production Details</h2>
 
       <table>
         <thead>
@@ -241,11 +116,9 @@
             <th>Production</th>
             <th>Export</th>
             <th>Day End Stock</th>
-            <th>Delete</th>
           </tr>
         </thead>
-
-        <tbody id="rows"></tbody>
+        <tbody id="detailRows"></tbody>
       </table>
     </div>
   </main>
@@ -256,323 +129,195 @@
       "sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH"
     );
 
-    const deletePassword = "1213";
-    let records = [];
+    function formatDate(isoDate) {
+      if (!isoDate) return "";
 
-    const defaultOptions = {
-      model: ["iPhone 13", "Samsung S23"],
-      storage: ["-", "64 GB", "128 GB", "256 GB"],
-      color: ["-", "Black", "White", "Blue", "Green"],
-      grade: ["A", "B", "Bulges A", "Bulges B"]
-    };
-
-    function normalize(value) {
-      return String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+      const parts = isoDate.split("-");
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
-    async function syncOptionsFromLaptop() {
-      for (const category of Object.keys(defaultOptions)) {
-        const savedOptions = JSON.parse(
-          localStorage.getItem(category + "Options") || "[]"
-        );
+    function convertDate(value) {
+      if (!value) return null;
 
-        const options = [...defaultOptions[category], ...savedOptions];
-        const unique = [];
+      const parts = value.split("/");
 
-        options.forEach(function(value) {
-          if (!unique.some(item => normalize(item) === normalize(value))) {
-            unique.push(value.trim());
-          }
-        });
+      if (parts.length !== 3) return null;
 
-        const rows = unique.map(function(value) {
-          return {
-            category: category,
-            value: value,
-            normalized_value: normalize(value)
-          };
-        });
+      const day = parts[0].padStart(2, "0");
+      const month = parts[1].padStart(2, "0");
+      const year = parts[2];
 
-        await db
-          .from("production_options")
-          .upsert(rows, {
-            onConflict: "category,normalized_value",
-            ignoreDuplicates: true
-          });
+      if (day.length !== 2 || month.length !== 2 || year.length !== 4) {
+        return null;
       }
+
+      return `${year}-${month}-${day}`;
     }
 
-    async function loadOptions(category) {
-      const { data, error } = await db
-        .from("production_options")
-        .select("id, value")
-        .eq("category", category)
-        .order("value");
+    function todayDate() {
+      const today = new Date();
+      const day = String(today.getDate()).padStart(2, "0");
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const year = today.getFullYear();
 
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      const select = document.getElementById(category);
-      select.innerHTML = "";
-
-      (data || []).forEach(function(item) {
-        select.innerHTML += `<option value="${item.value}">${item.value}</option>`;
-      });
+      return `${day}/${month}/${year}`;
     }
 
-    async function addOption(category) {
-      const value = prompt("Enter new option:");
+    async function showReport() {
+      const errorMessage = document.getElementById("errorMessage");
+      errorMessage.textContent = "";
 
-      if (!value || value.trim() === "") {
+      const fromDate = convertDate(document.getElementById("fromDate").value);
+      const toDate = convertDate(document.getElementById("toDate").value);
+
+      if (!fromDate || !toDate) {
+        errorMessage.textContent = "Please use date format DD/MM/YYYY.";
         return;
       }
 
-      const { error } = await db
-        .from("production_options")
-        .insert({
-          category: category,
-          value: value.trim(),
-          normalized_value: normalize(value)
-        });
-
-      if (error && !error.message.includes("duplicate")) {
-        alert(error.message);
-        return;
-      }
-
-      await loadOptions(category);
-      document.getElementById(category).value = value.trim();
-      updateStockPreview();
-    }
-
-    async function deleteOption(category) {
-      const password = prompt("Enter delete password:");
-
-      if (password !== deletePassword) {
-        alert("Incorrect password.");
-        return;
-      }
-
-      const value = document.getElementById(category).value;
-
-      if (!confirm(`Delete "${value}" from the list?`)) {
-        return;
-      }
-
-      const { error } = await db
-        .from("production_options")
-        .delete()
-        .eq("category", category)
-        .eq("normalized_value", normalize(value));
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      await loadOptions(category);
-      updateStockPreview();
-    }
-
-    async function loadRecords() {
       const { data, error } = await db
         .from("production_records")
         .select("*")
-        .order("record_date", { ascending: false });
+        .order("record_date", { ascending: true });
 
       if (error) {
-        alert(error.message);
+        errorMessage.textContent = error.message;
         return;
       }
 
-      records = data || [];
-      showRecords();
-      updateStockPreview();
-    }
+      const allRecords = data || [];
 
-    function getPreviousStock() {
-      const date = document.getElementById("date").value;
-      const model = document.getElementById("model").value;
-      const storage = document.getElementById("storage").value;
-      const color = document.getElementById("color").value;
-      const grade = document.getElementById("grade").value;
-
-      const previousRecords = records.filter(function(record) {
-        return record.record_date < date &&
-          normalize(record.model) === normalize(model) &&
-          normalize(record.storage) === normalize(storage) &&
-          normalize(record.color) === normalize(color) &&
-          normalize(record.grade) === normalize(grade);
+      const dateRecords = allRecords.filter(function(record) {
+        return record.record_date >= fromDate &&
+          record.record_date <= toDate;
       });
 
-      previousRecords.sort(function(a, b) {
-        return b.record_date.localeCompare(a.record_date);
-      });
-
-      return previousRecords.length
-        ? Number(previousRecords[0].closing_stock) || 0
-        : 0;
-    }
-
-    function updateStockPreview() {
-      const production = Number(
-        document.getElementById("productionQty").value
-      ) || 0;
-
-      const exportQty = Number(
-        document.getElementById("exportQty").value
-      ) || 0;
-
-      document.getElementById("preview").textContent =
-        getPreviousStock() + production - exportQty;
-    }
-
-    async function saveRecord() {
-      const date = document.getElementById("date").value;
-      const model = document.getElementById("model").value;
-      const storage = document.getElementById("storage").value;
-      const color = document.getElementById("color").value;
-      const grade = document.getElementById("grade").value;
-      const production = Number(document.getElementById("productionQty").value);
-      const exportQty = Number(document.getElementById("exportQty").value) || 0;
-
-      if (!date || Number.isNaN(production)) {
-        alert("Please enter Date and Produced Quantity.");
-        return;
-      }
-
-      const oldRecord = records.find(function(record) {
-        return record.record_date === date &&
-          normalize(record.model) === normalize(model) &&
-          normalize(record.storage) === normalize(storage) &&
-          normalize(record.color) === normalize(color) &&
-          normalize(record.grade) === normalize(grade);
-      });
-
-      const openingStock = oldRecord
-        ? Number(oldRecord.opening_stock) || 0
-        : getPreviousStock();
-
-      const totalProduction =
-        (oldRecord ? Number(oldRecord.production) || 0 : 0) + production;
-
-      const totalExport =
-        (oldRecord ? Number(oldRecord.export_qty) || 0 : 0) + exportQty;
-
-      const closingStock = openingStock + totalProduction - totalExport;
-
-      if (closingStock < 0) {
-        alert("Export quantity is more than available stock.");
-        return;
-      }
-
-      const payload = {
-        record_date: date,
-        model: model,
-        storage: storage,
-        color: color,
-        grade: grade,
-        production: totalProduction,
-        export_qty: totalExport,
-        opening_stock: openingStock,
-        closing_stock: closingStock
-      };
-
-      const result = oldRecord
-        ? await db.from("production_records").update(payload).eq("id", oldRecord.id)
-        : await db.from("production_records").insert(payload);
-
-      if (result.error) {
-        alert(result.error.message);
-        return;
-      }
-
-      document.getElementById("productionQty").value = "";
-      document.getElementById("exportQty").value = "0";
-
-      await loadRecords();
-    }
-
-    function showRecords() {
-      const table = document.getElementById("rows");
-
-      table.innerHTML = records.map(function(record) {
+      document.getElementById("detailRows").innerHTML = dateRecords.map(function(record) {
         return `
           <tr>
-            <td>${record.record_date}</td>
+            <td>${formatDate(record.record_date)}</td>
             <td>${record.model}</td>
             <td>${record.storage}</td>
             <td>${record.color}</td>
             <td>${record.grade}</td>
             <td>${record.production}</td>
             <td>${record.export_qty}</td>
-            <td><strong>${record.closing_stock}</strong></td>
-            <td>
-              <button class="delete-btn" onclick="deleteRecord('${record.id}')">
-                Delete
-              </button>
-            </td>
+            <td>${record.closing_stock}</td>
           </tr>
         `;
       }).join("");
+
+      const latestRecords = {};
+
+      allRecords
+        .filter(function(record) {
+          return record.record_date <= toDate;
+        })
+        .forEach(function(record) {
+          const key = [
+            record.model,
+            record.storage,
+            record.color,
+            record.grade
+          ].join("|").toLowerCase();
+
+          if (
+            !latestRecords[key] ||
+            latestRecords[key].record_date <= record.record_date
+          ) {
+            latestRecords[key] = record;
+          }
+        });
+
+      const summary = {};
+
+      Object.values(latestRecords).forEach(function(record) {
+        const key = [
+          record.model,
+          record.storage,
+          record.color
+        ].join("|").toLowerCase();
+
+        if (!summary[key]) {
+          summary[key] = {
+            model: record.model,
+            storage: record.storage,
+            color: record.color,
+            a: 0,
+            b: 0,
+            bulgesA: 0,
+            bulgesB: 0
+          };
+        }
+
+        const stock = Number(record.closing_stock) || 0;
+
+        if (record.grade === "A") summary[key].a += stock;
+        if (record.grade === "B") summary[key].b += stock;
+        if (record.grade === "Bulges A") summary[key].bulgesA += stock;
+        if (record.grade === "Bulges B") summary[key].bulgesB += stock;
+      });
+
+      let totalA = 0;
+      let totalB = 0;
+      let totalBulgesA = 0;
+      let totalBulgesB = 0;
+
+      document.getElementById("mainRows").innerHTML = "";
+      document.getElementById("bulgesRows").innerHTML = "";
+
+      Object.values(summary).forEach(function(item) {
+        totalA += item.a;
+        totalB += item.b;
+        totalBulgesA += item.bulgesA;
+        totalBulgesB += item.bulgesB;
+
+        document.getElementById("mainRows").innerHTML += `
+          <tr>
+            <td>${item.model}</td>
+            <td>${item.storage}</td>
+            <td>${item.color}</td>
+            <td>${item.a}</td>
+            <td>${item.b}</td>
+            <td><strong>${item.a + item.b}</strong></td>
+          </tr>
+        `;
+
+        document.getElementById("bulgesRows").innerHTML += `
+          <tr>
+            <td>${item.model}</td>
+            <td>${item.storage}</td>
+            <td>${item.color}</td>
+            <td>${item.bulgesA}</td>
+            <td>${item.bulgesB}</td>
+            <td><strong>${item.bulgesA + item.bulgesB}</strong></td>
+          </tr>
+        `;
+      });
+
+      document.getElementById("mainTotals").innerHTML = `
+        <tr>
+          <td colspan="3">Grand Total</td>
+          <td>${totalA}</td>
+          <td>${totalB}</td>
+          <td>${totalA + totalB}</td>
+        </tr>
+      `;
+
+      document.getElementById("bulgesTotals").innerHTML = `
+        <tr>
+          <td colspan="3">Grand Total</td>
+          <td>${totalBulgesA}</td>
+          <td>${totalBulgesB}</td>
+          <td>${totalBulgesA + totalBulgesB}</td>
+        </tr>
+      `;
     }
 
-    async function deleteRecord(id) {
-      const password = prompt("Enter delete password:");
+    document.getElementById("fromDate").value = "01/01/2020";
+    document.getElementById("toDate").value = todayDate();
 
-      if (password !== deletePassword) {
-        alert("Incorrect password.");
-        return;
-      }
-
-      if (!confirm("Delete this production record?")) {
-        return;
-      }
-
-      const { error } = await db
-        .from("production_records")
-        .delete()
-        .eq("id", id);
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      await loadRecords();
-    }
-
-    async function initializeApp() {
-      document.getElementById("date").valueAsDate = new Date();
-
-      await syncOptionsFromLaptop();
-
-      for (const category of Object.keys(defaultOptions)) {
-        await loadOptions(category);
-
-        document
-          .getElementById(category)
-          .addEventListener("change", updateStockPreview);
-      }
-
-      document
-        .getElementById("date")
-        .addEventListener("change", updateStockPreview);
-
-      document
-        .getElementById("productionQty")
-        .addEventListener("input", updateStockPreview);
-
-      document
-        .getElementById("exportQty")
-        .addEventListener("input", updateStockPreview);
-
-      await loadRecords();
-    }
-
-    initializeApp();
+    showReport();
   </script>
 </body>
 </html>
