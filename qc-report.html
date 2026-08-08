@@ -4,81 +4,370 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QC Reports | Greenloop FZC</title>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    *{box-sizing:border-box;font-family:Arial,sans-serif}
-    body{margin:0;background:#f3f7f4;color:#123c2b}
-    header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}
-    .header-logo{width:55px;height:42px;object-fit:contain}
-    .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}
-    .top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
-    main{max-width:1500px;margin:auto;padding:35px 20px}
-    .box{margin-top:24px;padding:25px;border-radius:14px;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.08);overflow-x:auto}
-    .filters{display:flex;gap:15px;align-items:end;flex-wrap:wrap}
-    label{display:block;margin-bottom:7px;font-weight:bold}
-    input{padding:11px;border:1px solid #cfd8d2;border-radius:8px;font-size:15px}
-    button{padding:12px 20px;border:0;border-radius:8px;background:#168653;color:#fff;font-weight:bold;cursor:pointer}
-    .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
-    .summary-card{padding:18px;border-radius:12px;background:#e7f5ec;border-left:5px solid #168653}
-    .summary-card small{display:block;color:#526c5e;margin-bottom:7px}.summary-card strong{font-size:28px;color:#0b5b38}
-    table{width:100%;border-collapse:collapse;margin-top:15px;min-width:1700px}
-    th,td{padding:11px;border-bottom:1px solid #e2e7e4;text-align:center;vertical-align:top}
-    th{background:#0b5b38;color:#fff;white-space:nowrap}
-    .status{font-weight:bold;padding:6px 10px;border-radius:15px;display:inline-block;white-space:nowrap}
-    .stock-in{background:#e7f5ec;color:#0b6e42}.lab{background:#fff4dc;color:#8a5c00}.fixed{background:#dff1ff;color:#075d93}.rework{background:#ffe5e5;color:#b52d2d}.stock-out{background:#e8e8e8;color:#4a4a4a}
-    #message{margin-top:12px;font-weight:bold}
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3faf6;
+      color: #073d2a;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, #063e2a, #0b6a45);
+      color: white;
+      padding: 16px 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.18);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .brand img {
+      width: 45px;
+      height: 45px;
+      object-fit: contain;
+      background: white;
+      border-radius: 50%;
+      padding: 3px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 14px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .nav-btn {
+      background: white;
+      color: #07633d;
+    }
+
+    .nav-btn:hover,
+    .filter-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .logout-btn {
+      background: #d94343;
+      color: white;
+    }
+
+    .container {
+      width: min(1500px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 55px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 36px;
+      color: #063e2a;
+    }
+
+    .subtitle {
+      color: #5d7769;
+      margin: 9px 0 25px;
+      font-size: 16px;
+    }
+
+    .filter-box {
+      background: white;
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: end;
+      box-shadow: 0 8px 20px rgba(5, 84, 49, 0.08);
+      margin-bottom: 24px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field label {
+      font-weight: bold;
+      font-size: 14px;
+      color: #075334;
+    }
+
+    input {
+      border: 1px solid #cddfd4;
+      border-radius: 9px;
+      padding: 11px;
+      font-size: 15px;
+      min-width: 170px;
+    }
+
+    .filter-btn {
+      background: #087143;
+      color: white;
+      padding: 12px 22px;
+    }
+
+    .reset-btn {
+      background: #e5f4eb;
+      color: #07633d;
+      padding: 12px 22px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+      margin-bottom: 28px;
+    }
+
+    .summary-card {
+      background: white;
+      border-radius: 15px;
+      padding: 19px;
+      border-left: 5px solid #25a96b;
+      box-shadow: 0 8px 18px rgba(5, 84, 49, 0.08);
+    }
+
+    .summary-card .label {
+      color: #607b6e;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .summary-card .number {
+      font-size: 29px;
+      font-weight: bold;
+      color: #063e2a;
+    }
+
+    .section-title {
+      margin: 28px 0 13px;
+      font-size: 24px;
+      color: #063e2a;
+    }
+
+    .table-wrap {
+      background: white;
+      border-radius: 15px;
+      overflow-x: auto;
+      box-shadow: 0 8px 20px rgba(5, 84, 49, 0.09);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1850px;
+    }
+
+    th {
+      background: #07633d;
+      color: white;
+      padding: 13px 11px;
+      text-align: left;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 11px;
+      border-bottom: 1px solid #e6f0ea;
+      font-size: 13px;
+      vertical-align: top;
+      color: #294e3d;
+    }
+
+    tr:hover td {
+      background: #f4fbf7;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 28px;
+      color: #6d8479;
+      font-weight: bold;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-weight: bold;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .badge-stock-in {
+      background: #e5f4eb;
+      color: #07633d;
+    }
+
+    .badge-lab {
+      background: #fff3d9;
+      color: #9a6100;
+    }
+
+    .badge-fixed {
+      background: #d9f4e3;
+      color: #087143;
+    }
+
+    .badge-rework {
+      background: #ffe1e1;
+      color: #b42626;
+    }
+
+    .badge-stock-out {
+      background: #e0ecff;
+      color: #195ca8;
+    }
+
+    @media (max-width: 1000px) {
+      .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .topbar {
+        padding: 14px;
+      }
+
+      .brand {
+        font-size: 20px;
+      }
+
+      .top-actions {
+        width: 100%;
+      }
+
+      .top-actions button {
+        flex: 1;
+        padding: 10px 7px;
+      }
+
+      .container {
+        width: min(100% - 20px, 650px);
+        padding-top: 24px;
+      }
+
+      h1 {
+        font-size: 29px;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .filter-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .field {
+        grid-column: span 2;
+      }
+
+      input {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <header>
-    <img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">
-    Greenloop FZC
+  <header class="topbar">
+    <div class="brand">
+      <img src="looplogo.jpg" alt="Greenloop Logo">
+      <span>Greenloop FZC</span>
+    </div>
+
+    <div class="top-actions">
+      <button class="nav-btn" onclick="goBack()">← Back</button>
+      <button class="nav-btn" onclick="location.href='quality-control.html'">Quality Control</button>
+      <button class="nav-btn" onclick="location.href='dashboard.html'">⌂ Dashboard</button>
+      <button class="nav-btn" onclick="location.href='index.html'">⌂ Home</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
   </header>
 
-  <nav class="top-nav">
-    <a href="javascript:history.back()">Back</a>
-    <a href="quality-control.html">Quality Control</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="index.html">Home / Login</a>
-    <a href="#" onclick="logout();return false;">Logout</a>
-  </nav>
-
-  <main>
+  <main class="container">
     <h1>Quality Control Reports</h1>
+    <p class="subtitle">Complete results from Inventory Entry, Repair Process, Lab Process and Stock Out.</p>
 
-    <div class="box">
-      <div class="filters">
-        <div>
-          <label>From Date</label>
-          <input type="date" id="fromDate">
-        </div>
-
-        <div>
-          <label>To Date</label>
-          <input type="date" id="toDate">
-        </div>
-
-        <button onclick="loadReport()">Show Report</button>
+    <div class="filter-box">
+      <div class="field">
+        <label for="fromDate">From Date</label>
+        <input type="date" id="fromDate">
       </div>
 
-      <div id="message"></div>
-    </div>
-
-    <div class="box">
-      <div class="summary">
-        <div class="summary-card"><small>Total Inventory Entry</small><strong id="totalStockIn">0</strong></div>
-        <div class="summary-card"><small>Sent to Lab</small><strong id="totalLab">0</strong></div>
-        <div class="summary-card"><small>Fixed</small><strong id="totalFixed">0</strong></div>
-        <div class="summary-card"><small>Rework</small><strong id="totalRework">0</strong></div>
-        <div class="summary-card"><small>Stock Out</small><strong id="totalStockOut">0</strong></div>
+      <div class="field">
+        <label for="toDate">To Date</label>
+        <input type="date" id="toDate">
       </div>
+
+      <button class="filter-btn" onclick="loadReport()">Apply Filter</button>
+      <button class="reset-btn" onclick="resetFilter()">Clear Filter</button>
     </div>
 
-    <div class="box">
-      <h2>QC Complete Report</h2>
+    <section class="summary-grid">
+      <div class="summary-card">
+        <div class="label">Inventory Entry</div>
+        <div class="number" id="stockInTotal">0</div>
+      </div>
 
+      <div class="summary-card">
+        <div class="label">Sent to Lab</div>
+        <div class="number" id="labTotal">0</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="label">Fixed / Production</div>
+        <div class="number" id="fixedTotal">0</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="label">Rework</div>
+        <div class="number" id="reworkTotal">0</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="label">Stock Out</div>
+        <div class="number" id="stockOutTotal">0</div>
+      </div>
+    </section>
+
+    <h2 class="section-title">QC Process Details</h2>
+
+    <div class="table-wrap">
       <table>
         <thead>
           <tr>
@@ -90,8 +379,8 @@
             <th>IMEI</th>
             <th>Supplier Grade</th>
             <th>Our Grade</th>
-            <th>Repair Diagnosis</th>
-            <th>Parts</th>
+            <th>Problems / Diagnosis</th>
+            <th>Parts Details</th>
             <th>Technician</th>
             <th>Work Done</th>
             <th>Time</th>
@@ -101,171 +390,296 @@
           </tr>
         </thead>
 
-        <tbody id="reportRows"></tbody>
+        <tbody id="reportBody">
+          <tr>
+            <td colspan="16" class="empty">Loading report...</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </main>
 
   <script>
-    const db = window.supabase.createClient(
-      'https://ohvplvdxflmgqoptwftk.supabase.co',
-      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH'
-    );
+    const SUPABASE_URL = "https://ohvplvdxflmgqoptwftk.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH";
 
-    function formatDate(value) {
-      if (!value) return '-';
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        experimental: {
+          passkey: true
+        }
+      }
+    });
 
-      const parts = String(value).split('-');
-
-      return parts.length === 3
-        ? `${parts[2]}-${parts[1]}-${parts[0]}`
-        : value;
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    function setMessage(message, error = false) {
-      const element = document.getElementById('message');
-      element.textContent = message;
-      element.style.color = error ? '#c43838' : '#0b6e42';
+    function formatDate(dateValue) {
+      if (!dateValue) {
+        return "-";
+      }
+
+      const parts = String(dateValue).split("-");
+      if (parts.length !== 3) {
+        return dateValue;
+      }
+
+      return parts[2] + "-" + parts[1] + "-" + parts[0];
     }
 
-    function latestByDate(records) {
-      if (!records || !records.length) return null;
+    function formatMinutes(minutes) {
+      const value = Number(minutes || 0);
 
-      return [...records].sort((a, b) =>
-        String(b.created_at || '').localeCompare(String(a.created_at || ''))
-      )[0];
+      if (!value) {
+        return "-";
+      }
+
+      const hours = Math.floor(value / 60);
+      const remainingMinutes = value % 60;
+
+      if (hours > 0 && remainingMinutes > 0) {
+        return hours + "h " + remainingMinutes + "m";
+      }
+
+      if (hours > 0) {
+        return hours + "h";
+      }
+
+      return remainingMinutes + "m";
     }
 
-    function statusClass(status) {
-      if (status === 'Stock In') return 'stock-in';
-      if (status === 'Sent to Lab') return 'lab';
-      if (status === 'Fixed / Added to Production') return 'fixed';
-      if (status === 'Rework') return 'rework';
-      return 'stock-out';
+    function diagnosisText(repair) {
+      if (!repair) {
+        return "-";
+      }
+
+      const items = [
+        ["Battery", repair.battery_status],
+        ["Case", repair.case_status],
+        ["Glass", repair.glass_status],
+        ["Polish", repair.polish_status],
+        ["TP", repair.tp_status],
+        ["NFC", repair.nfc_status],
+        ["Vibrator", repair.vibrator_status],
+        ["Speaker", repair.speaker_status],
+        ["Camera", repair.camera_status],
+        ["Face ID", repair.face_id_status],
+        ["LCD", repair.lcd_status],
+        ["Mic", repair.mic_status]
+      ];
+
+      const selectedItems = items
+        .filter(function(item) {
+          return item[1] && item[1] !== "Not Checked" && item[1] !== "OK" && item[1] !== "N/A";
+        })
+        .map(function(item) {
+          return item[0] + ": " + item[1];
+        });
+
+      if (selectedItems.length > 0) {
+        return selectedItems.join("<br>");
+      }
+
+      return repair.problem_details
+        ? escapeHtml(repair.problem_details).replace(/\n/g, "<br>")
+        : "-";
+    }
+
+    function statusBadge(status) {
+      const statusMap = {
+        "Stock In": "badge-stock-in",
+        "Sent to Lab": "badge-lab",
+        "Fixed / Added to Production": "badge-fixed",
+        "Rework": "badge-rework",
+        "Stock Out": "badge-stock-out"
+      };
+
+      return '<span class="badge ' + statusMap[status] + '">' + status + "</span>";
+    }
+
+    function resetSummary() {
+      document.getElementById("stockInTotal").textContent = "0";
+      document.getElementById("labTotal").textContent = "0";
+      document.getElementById("fixedTotal").textContent = "0";
+      document.getElementById("reworkTotal").textContent = "0";
+      document.getElementById("stockOutTotal").textContent = "0";
     }
 
     async function loadReport() {
-      setMessage('Loading report...');
+      const reportBody = document.getElementById("reportBody");
+      const fromDate = document.getElementById("fromDate").value;
+      const toDate = document.getElementById("toDate").value;
 
-      const from = fromDate.value || '0000-01-01';
-      const to = toDate.value || '9999-12-31';
+      reportBody.innerHTML = '<tr><td colspan="16" class="empty">Loading report...</td></tr>';
+      resetSummary();
+
+      let stockInQuery = db
+        .from("quality_stock_in")
+        .select("*")
+        .order("received_date", { ascending: false })
+        .order("serial_no", { ascending: false });
+
+      if (fromDate) {
+        stockInQuery = stockInQuery.gte("received_date", fromDate);
+      }
+
+      if (toDate) {
+        stockInQuery = stockInQuery.lte("received_date", toDate);
+      }
 
       const [
-        stockInResult,
-        repairResult,
-        labResult,
-        stockOutResult
+        stockInResponse,
+        repairResponse,
+        labResponse,
+        stockOutResponse
       ] = await Promise.all([
-        db.from('quality_stock_in').select('*').order('received_date', { ascending: false }),
-        db.from('repair_process_records').select('*'),
-        db.from('lab_process_records').select('*'),
-        db.from('quality_stock_out').select('*')
+        stockInQuery,
+        db.from("repair_process_records").select("*").order("created_at", { ascending: false }),
+        db.from("lab_process_records").select("*").order("created_at", { ascending: false }),
+        db.from("quality_stock_out").select("*").order("out_date", { ascending: false })
       ]);
 
-      const error =
-        stockInResult.error ||
-        repairResult.error ||
-        labResult.error ||
-        stockOutResult.error;
+      const error = stockInResponse.error || repairResponse.error || labResponse.error || stockOutResponse.error;
 
       if (error) {
-        setMessage(error.message, true);
+        reportBody.innerHTML =
+          '<tr><td colspan="16" class="empty">Unable to load report: ' +
+          escapeHtml(error.message) +
+          "</td></tr>";
         return;
       }
 
-      const stockIn = (stockInResult.data || [])
-        .filter(record => record.received_date >= from && record.received_date <= to);
+      const stockInRecords = stockInResponse.data || [];
+      const repairRecords = repairResponse.data || [];
+      const labRecords = labResponse.data || [];
+      const stockOutRecords = stockOutResponse.data || [];
 
-      const repairs = repairResult.data || [];
-      const labs = labResult.data || [];
-      const stockOut = stockOutResult.data || [];
-
-      const repairsByStockId = {};
-      repairs.forEach(record => {
-        if (!repairsByStockId[record.stock_in_id]) repairsByStockId[record.stock_in_id] = [];
-        repairsByStockId[record.stock_in_id].push(record);
+      const repairByStockIn = {};
+      repairRecords.forEach(function(repair) {
+        if (!repairByStockIn[repair.stock_in_id]) {
+          repairByStockIn[repair.stock_in_id] = repair;
+        }
       });
 
-      const labsByRepairId = {};
-      labs.forEach(record => {
-        if (!labsByRepairId[record.repair_id]) labsByRepairId[record.repair_id] = [];
-        labsByRepairId[record.repair_id].push(record);
+      const labByRepair = {};
+      labRecords.forEach(function(lab) {
+        if (!labByRepair[lab.repair_id]) {
+          labByRepair[lab.repair_id] = lab;
+        }
       });
 
-      const outByStockId = {};
-      stockOut.forEach(record => {
-        if (!outByStockId[record.stock_in_id]) outByStockId[record.stock_in_id] = [];
-        outByStockId[record.stock_in_id].push(record);
+      const stockOutByStockIn = {};
+      stockOutRecords.forEach(function(stockOut) {
+        stockOutByStockIn[stockOut.stock_in_id] = stockOut;
       });
 
-      let sentToLab = 0;
-      let fixed = 0;
-      let rework = 0;
-      let out = 0;
+      let sentToLabCount = 0;
+      let fixedCount = 0;
+      let reworkCount = 0;
+      let stockOutCount = 0;
 
-      reportRows.innerHTML = stockIn.map(phone => {
-        const repair = latestByDate(repairsByStockId[phone.id]);
-        const lab = repair ? latestByDate(labsByRepairId[repair.id]) : null;
-        const stockOutRecord = latestByDate(outByStockId[phone.id]);
+      if (!stockInRecords.length) {
+        reportBody.innerHTML = '<tr><td colspan="16" class="empty">No QC records found for the selected dates.</td></tr>';
+        return;
+      }
 
-        let currentStatus = 'Stock In';
+      const rows = stockInRecords.map(function(stockIn) {
+        const repair = repairByStockIn[stockIn.id];
+        const lab = repair ? labByRepair[repair.id] : null;
+        const stockOut = stockOutByStockIn[stockIn.id];
 
-        if (repair && !lab) currentStatus = 'Sent to Lab';
-        if (lab && lab.result === 'Fixed') currentStatus = 'Fixed / Added to Production';
-        if (lab && lab.result === 'Rework') currentStatus = 'Rework';
-        if (stockOutRecord) currentStatus = 'Stock Out';
+        let currentStatus = "Stock In";
 
-        if (currentStatus === 'Sent to Lab') sentToLab++;
-        if (currentStatus === 'Fixed / Added to Production') fixed++;
-        if (currentStatus === 'Rework') rework++;
-        if (currentStatus === 'Stock Out') out++;
+        if (repair) {
+          currentStatus = "Sent to Lab";
+          sentToLabCount++;
+        }
+
+        if (lab && lab.result === "Fixed") {
+          currentStatus = "Fixed / Added to Production";
+          fixedCount++;
+        }
+
+        if (lab && lab.result === "Rework") {
+          currentStatus = "Rework";
+          reworkCount++;
+        }
+
+        if (stockOut) {
+          currentStatus = "Stock Out";
+          stockOutCount++;
+        }
 
         return `
           <tr>
-            <td>${phone.serial_no}</td>
-            <td>${formatDate(phone.received_date)}</td>
-            <td>${phone.model}</td>
-            <td>${phone.storage}</td>
-            <td>${phone.color}</td>
-            <td>${phone.imei}</td>
-            <td>${phone.supplier_grade}</td>
-            <td>${phone.our_grade}</td>
-            <td>${repair ? repair.problem_details || '-' : '-'}</td>
-            <td>${repair ? repair.parts_details || '-' : '-'}</td>
-            <td>${lab ? lab.technician : '-'}</td>
-            <td>${lab ? lab.work_done : '-'}</td>
-            <td>${lab ? `${lab.time_minutes} min` : '-'}</td>
-            <td>${lab ? lab.result : '-'}</td>
-            <td>${stockOutRecord ? formatDate(stockOutRecord.out_date) : '-'}</td>
-            <td><span class="status ${statusClass(currentStatus)}">${currentStatus}</span></td>
+            <td>${escapeHtml(stockIn.serial_no)}</td>
+            <td>${formatDate(stockIn.received_date)}</td>
+            <td>${escapeHtml(stockIn.model)}</td>
+            <td>${escapeHtml(stockIn.storage || "-")}</td>
+            <td>${escapeHtml(stockIn.color || "-")}</td>
+            <td>${escapeHtml(stockIn.imei)}</td>
+            <td>${escapeHtml(stockIn.supplier_grade)}</td>
+            <td>${escapeHtml(stockIn.our_grade)}</td>
+            <td>${diagnosisText(repair)}</td>
+            <td>${repair && repair.parts_details ? escapeHtml(repair.parts_details) : "-"}</td>
+            <td>${lab ? escapeHtml(lab.technician) : "-"}</td>
+            <td>${lab ? escapeHtml(lab.work_done) : "-"}</td>
+            <td>${lab ? formatMinutes(lab.time_minutes) : "-"}</td>
+            <td>${lab ? escapeHtml(lab.result) : "-"}</td>
+            <td>${stockOut ? formatDate(stockOut.out_date) : "-"}</td>
+            <td>${statusBadge(currentStatus)}</td>
           </tr>
         `;
-      }).join('');
+      });
 
-      totalStockIn.textContent = stockIn.length;
-      totalLab.textContent = sentToLab;
-      totalFixed.textContent = fixed;
-      totalRework.textContent = rework;
-      totalStockOut.textContent = out;
+      document.getElementById("stockInTotal").textContent = stockInRecords.length;
+      document.getElementById("labTotal").textContent = sentToLabCount;
+      document.getElementById("fixedTotal").textContent = fixedCount;
+      document.getElementById("reworkTotal").textContent = reworkCount;
+      document.getElementById("stockOutTotal").textContent = stockOutCount;
 
-      setMessage('Report updated.');
+      reportBody.innerHTML = rows.join("");
+    }
+
+    function resetFilter() {
+      document.getElementById("fromDate").value = "";
+      document.getElementById("toDate").value = "";
+      loadReport();
+    }
+
+    function goBack() {
+      if (history.length > 1) {
+        history.back();
+      } else {
+        location.href = "quality-control.html";
+      }
     }
 
     async function logout() {
       await db.auth.signOut();
-      window.location.href = 'index.html';
+      location.href = "index.html";
     }
 
-    db.auth.getSession().then(function(result) {
-      if (!result.data.session) {
-        window.location.href = 'index.html';
+    async function checkLogin() {
+      const {
+        data: { session }
+      } = await db.auth.getSession();
+
+      if (!session) {
+        location.href = "index.html";
+        return;
       }
-    });
 
-    fromDate.value = '2020-01-01';
-    toDate.valueAsDate = new Date();
+      loadReport();
+    }
 
-    loadReport();
+    checkLogin();
   </script>
 </body>
 </html>
