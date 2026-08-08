@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock In | Greenloop FZC</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f3f7f4;
+      color: #123c2b;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 8%;
+      background: #0b5b38;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .header-logo {
+      width: 55px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .top-nav {
+      padding: 14px 8%;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: #e5f3ea;
+    }
+
+    .top-nav a {
+      padding: 10px 16px;
+      color: #0b5b38;
+      background: white;
+      border-radius: 7px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    main {
+      max-width: 1250px;
+      margin: auto;
+      padding: 35px 20px;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      margin-top: 0;
+      color: #526c5e;
+    }
+
+    .box {
+      margin-top: 24px;
+      padding: 25px;
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cfd8d2;
+      border-radius: 8px;
+      font-size: 15px;
+      background: white;
+    }
+
+    .imei-box {
+      grid-column: span 2;
+    }
+
+    .imei-input {
+      border: 2px solid #168653;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .info {
+      padding: 14px;
+      margin-top: 20px;
+      border-radius: 8px;
+      background: #e7f5ec;
+      line-height: 1.5;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .save-btn {
+      margin-top: 20px;
+      padding: 13px 28px;
+      background: #168653;
+      font-size: 16px;
+    }
+
+    .delete-btn {
+      padding: 8px 11px;
+      background: #d84343;
+    }
+
+    #status {
+      margin-top: 14px;
+      min-height: 20px;
+      font-weight: bold;
+    }
+
+    .success {
+      color: #0b6e42;
+    }
+
+    .error {
+      color: #c43838;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      min-width: 1000px;
+    }
+
+    th,
+    td {
+      padding: 11px;
+      border-bottom: 1px solid #e2e7e4;
+      text-align: center;
+    }
+
+    th {
+      background: #0b5b38;
+      color: white;
+    }
+
+    @media (max-width: 650px) {
+      main {
+        padding: 28px 14px;
+      }
+
+      .box {
+        padding: 18px;
+      }
+
+      .imei-box {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">
+    Greenloop FZC
+  </header>
+
+  <nav class="top-nav">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="quality-control.html">Quality Control</a>
+    <a href="index.html">Home / Login</a>
+  </nav>
+
+  <main>
+    <h1>Stock In</h1>
+    <p class="subtitle">Scan or enter the IMEI to receive new stock.</p>
+
+    <div class="box">
+      <div class="form-grid">
+        <div>
+          <label>S.No</label>
+          <input type="text" value="Automatic" disabled>
+        </div>
+
+        <div>
+          <label>Date</label>
+          <input type="date" id="receivedDate">
+        </div>
+
+        <div>
+          <label>Model</label>
+          <select id="model"></select>
+        </div>
+
+        <div>
+          <label>Storage / GB</label>
+          <select id="storage"></select>
+        </div>
+
+        <div>
+          <label>Color</label>
+          <select id="color"></select>
+        </div>
+
+        <div>
+          <label>Supplier Grade</label>
+          <select id="supplierGrade"></select>
+        </div>
+
+        <div>
+          <label>Our Grade</label>
+          <select id="ourGrade"></select>
+        </div>
+
+        <div class="imei-box">
+          <label>IMEI Scanner Input</label>
+          <input
+            type="text"
+            id="imei"
+            class="imei-input"
+            placeholder="Click here and scan IMEI"
+            inputmode="numeric"
+            autocomplete="off"
+          >
+        </div>
+      </div>
+
+      <div class="info">
+        Keep the cursor in the IMEI field, then scan the phone barcode.
+        If the scanner sends Enter after scanning, the record will save automatically.
+      </div>
+
+      <button class="save-btn" onclick="saveStockIn()">Save Stock In</button>
+      <div id="status"></div>
+    </div>
+
+    <div class="box">
+      <h2>Stock In Records</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Date</th>
+              <th>Model</th>
+              <th>GB</th>
+              <th>Color</th>
+              <th>IMEI</th>
+              <th>Supplier Grade</th>
+              <th>Our Grade</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody id="records"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const db = window.supabase.createClient(
+      'https://ohvplvdxflmgqoptwftk.supabase.co',
+      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH'
+    );
+
+    const deletePassword = '1213';
+    let stockRecords = [];
+
+    const defaultOptions = {
+      model: ['-', '12 Mini', '13 Mini', '13', '13 Pro', '14', '14 Pro', '15', '15 Pro', '15 Pro Max', '16 Pro', '16 Pro Max'],
+      storage: ['-', '64 GB', '128 GB', '256 GB', '512 GB', '1 TB'],
+      color: ['-', 'Black', 'White', 'Blue', 'Green', 'Gold', 'Purple'],
+      supplierGrade: ['A', 'B', 'C', 'D', 'RMA'],
+      ourGrade: ['A', 'B', 'Bulges A', 'Bulges B', 'RMA']
+    };
+
+    function setStatus(message, type = '') {
+      const status = document.getElementById('status');
+      status.className = type;
+      status.textContent = message;
+    }
+
+    function addSelectOptions(id, values) {
+      const select = document.getElementById(id);
+      select.innerHTML = values
+        .map(value => `<option value="${value}">${value}</option>`)
+        .join('');
+    }
+
+    async function loadSharedOptions() {
+      const { data, error } = await db
+        .from('production_options')
+        .select('category, value')
+        .order('value');
+
+      if (error || !data || !data.length) {
+        addSelectOptions('model', defaultOptions.model);
+        addSelectOptions('storage', defaultOptions.storage);
+        addSelectOptions('color', defaultOptions.color);
+      } else {
+        const models = data.filter(item => item.category === 'model').map(item => item.value);
+        const storage = data.filter(item => item.category === 'storage').map(item => item.value);
+        const colors = data.filter(item => item.category === 'color').map(item => item.value);
+
+        addSelectOptions('model', models.length ? models : defaultOptions.model);
+        addSelectOptions('storage', storage.length ? storage : defaultOptions.storage);
+        addSelectOptions('color', colors.length ? colors : defaultOptions.color);
+      }
+
+      addSelectOptions('supplierGrade', defaultOptions.supplierGrade);
+      addSelectOptions('ourGrade', defaultOptions.ourGrade);
+    }
+
+    async function loadRecords() {
+      const { data, error } = await db
+        .from('quality_stock_in')
+        .select('*')
+        .order('serial_no', { ascending: false });
+
+      if (error) {
+        setStatus(error.message, 'error');
+        return;
+      }
+
+      stockRecords = data || [];
+
+      document.getElementById('records').innerHTML = stockRecords
+        .map(record => `
+          <tr>
+            <td>${record.serial_no}</td>
+            <td>${formatDate(record.received_date)}</td>
+            <td>${record.model}</td>
+            <td>${record.storage}</td>
+            <td>${record.color}</td>
+            <td>${record.imei}</td>
+            <td>${record.supplier_grade}</td>
+            <td>${record.our_grade}</td>
+            <td>
+              <button class="delete-btn" onclick="deleteRecord('${record.id}')">Delete</button>
+            </td>
+          </tr>
+        `)
+        .join('');
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+
+      const parts = value.split('-');
+
+      if (parts.length !== 3) return value;
+
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+
+    async function saveStockIn() {
+      const receivedDate = document.getElementById('receivedDate').value;
+      const model = document.getElementById('model').value;
+      const storage = document.getElementById('storage').value;
+      const color = document.getElementById('color').value;
+      const supplierGrade = document.getElementById('supplierGrade').value;
+      const ourGrade = document.getElementById('ourGrade').value;
+      const imei = document.getElementById('imei').value.trim();
+
+      if (!receivedDate || !model || !storage || !color || !supplierGrade || !ourGrade || !imei) {
+        setStatus('Please complete all fields and scan the IMEI.', 'error');
+        return;
+      }
+
+      const { error } = await db
+        .from('quality_stock_in')
+        .insert({
+          received_date: receivedDate,
+          model: model,
+          storage: storage,
+          color: color,
+          imei: imei,
+          supplier_grade: supplierGrade,
+          our_grade: ourGrade
+        });
+
+      if (error) {
+        if (error.message.toLowerCase().includes('duplicate')) {
+          setStatus('This IMEI has already been entered.', 'error');
+        } else {
+          setStatus(error.message, 'error');
+        }
+
+        return;
+      }
+
+      document.getElementById('imei').value = '';
+      document.getElementById('imei').focus();
+
+      setStatus('Stock In record saved.', 'success');
+
+      await loadRecords();
+    }
+
+    async function deleteRecord(id) {
+      if (prompt('Enter delete password:') !== deletePassword) {
+        setStatus('Incorrect password.', 'error');
+        return;
+      }
+
+      if (!confirm('Delete this Stock In record?')) return;
+
+      const { error } = await db
+        .from('quality_stock_in')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        setStatus(error.message, 'error');
+        return;
+      }
+
+      setStatus('Record deleted.', 'success');
+
+      await loadRecords();
+    }
+
+    document.getElementById('receivedDate').valueAsDate = new Date();
+
+    document.getElementById('imei').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        saveStockIn();
+      }
+    });
+
+    loadSharedOptions();
+    loadRecords();
+
+    setTimeout(function() {
+      document.getElementById('imei').focus();
+    }, 700);
+  </script>
+</body>
+</html>
