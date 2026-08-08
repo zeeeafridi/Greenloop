@@ -1,10 +1,12 @@
-`production-report.html` ka poora code replace karein. Is update mein:
+Final Date-wise format ye hoga:
 
-- **RMA** ka separate column hoga.
-- Closing Stock Total = Grade A + Grade B + RMA.
-- Bulges total mein include nahi honge.
-- Date-wise Production Details ke neeche totals honge.
-- Date-wise total mein Bulges A/B include nahi honge.
+```text
+Date | Today's Production | Today's Export | Balance
+```
+
+Sab models ka accumulated data aik line per date mein hoga. Bulges include nahi honge.
+
+`production-report.html` ka poora code replace karein:
 
 ```html
 <!DOCTYPE html>
@@ -13,7 +15,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Production Reports | Greenloop FZC</title>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -73,7 +74,6 @@
 
     <div class="box">
       <h2>Closing Stock Summary</h2>
-      <p>Grade A, Grade B and RMA only. Bulges are not included in this total.</p>
 
       <table>
         <thead>
@@ -118,17 +118,13 @@
         <thead>
           <tr>
             <th>Date</th>
-            <th>Model</th>
-            <th>GB</th>
-            <th>Color</th>
-            <th>Grade</th>
-            <th>Production</th>
-            <th>Export</th>
-            <th>Day End Stock</th>
+            <th>Today's Production</th>
+            <th>Today's Export</th>
+            <th>Balance</th>
           </tr>
         </thead>
-        <tbody id="detailRows"></tbody>
-        <tfoot id="detailTotals"></tfoot>
+        <tbody id="dailyRows"></tbody>
+        <tfoot id="dailyTotals"></tfoot>
       </table>
     </div>
   </main>
@@ -140,7 +136,6 @@
     );
 
     function formatDate(isoDate) {
-      if (!isoDate) return "";
       const parts = isoDate.split("-");
       return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
@@ -151,19 +146,12 @@
       const parts = value.split("/");
       if (parts.length !== 3) return null;
 
-      const day = parts[0].padStart(2, "0");
-      const month = parts[1].padStart(2, "0");
-      const year = parts[2];
-
-      if (day.length !== 2 || month.length !== 2 || year.length !== 4) {
-        return null;
-      }
-
-      return `${year}-${month}-${day}`;
+      return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
     }
 
     function todayDate() {
       const today = new Date();
+
       return `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
     }
 
@@ -191,37 +179,56 @@
 
       const allRecords = data || [];
 
-      const dateRecords = allRecords.filter(function(record) {
+      const filteredRecords = allRecords.filter(function(record) {
         return record.record_date >= fromDate &&
           record.record_date <= toDate;
+      });
+
+      const dailySummary = {};
+
+      filteredRecords.forEach(function(record) {
+        if (record.grade === "Bulges A" || record.grade === "Bulges B") {
+          return;
+        }
+
+        if (!dailySummary[record.record_date]) {
+          dailySummary[record.record_date] = {
+            date: record.record_date,
+            production: 0,
+            exportQty: 0,
+            balance: 0
+          };
+        }
+
+        dailySummary[record.record_date].production += Number(record.production) || 0;
+        dailySummary[record.record_date].exportQty += Number(record.export_qty) || 0;
+        dailySummary[record.record_date].balance += Number(record.closing_stock) || 0;
       });
 
       let totalProduction = 0;
       let totalExport = 0;
 
-      document.getElementById("detailRows").innerHTML = dateRecords.map(function(record) {
-        if (record.grade !== "Bulges A" && record.grade !== "Bulges B") {
-          totalProduction += Number(record.production) || 0;
-          totalExport += Number(record.export_qty) || 0;
-        }
+      document.getElementById("dailyRows").innerHTML = Object.values(dailySummary)
+        .sort(function(a, b) {
+          return b.date.localeCompare(a.date);
+        })
+        .map(function(item) {
+          totalProduction += item.production;
+          totalExport += item.exportQty;
 
-        return `
-          <tr>
-            <td>${formatDate(record.record_date)}</td>
-            <td>${record.model}</td>
-            <td>${record.storage}</td>
-            <td>${record.color}</td>
-            <td>${record.grade}</td>
-            <td>${record.production}</td>
-            <td>${record.export_qty}</td>
-            <td>${record.closing_stock}</td>
-          </tr>
-        `;
-      }).join("");
+          return `
+            <tr>
+              <td>${formatDate(item.date)}</td>
+              <td>${item.production}</td>
+              <td>${item.exportQty}</td>
+              <td><strong>${item.balance}</strong></td>
+            </tr>
+          `;
+        }).join("");
 
-      document.getElementById("detailTotals").innerHTML = `
+      document.getElementById("dailyTotals").innerHTML = `
         <tr>
-          <td colspan="5">Grand Total Excluding Bulges</td>
+          <td>Grand Total Excluding Bulges</td>
           <td>${totalProduction}</td>
           <td>${totalExport}</td>
           <td></td>
@@ -247,7 +254,7 @@
           }
         });
 
-      const summary = {};
+      const stockSummary = {};
 
       Object.values(latestRecords).forEach(function(record) {
         const key = [
@@ -256,8 +263,8 @@
           record.color
         ].join("|").toLowerCase();
 
-        if (!summary[key]) {
-          summary[key] = {
+        if (!stockSummary[key]) {
+          stockSummary[key] = {
             model: record.model,
             storage: record.storage,
             color: record.color,
@@ -271,11 +278,11 @@
 
         const stock = Number(record.closing_stock) || 0;
 
-        if (record.grade === "A") summary[key].a += stock;
-        if (record.grade === "B") summary[key].b += stock;
-        if (record.grade === "RMA") summary[key].rma += stock;
-        if (record.grade === "Bulges A") summary[key].bulgesA += stock;
-        if (record.grade === "Bulges B") summary[key].bulgesB += stock;
+        if (record.grade === "A") stockSummary[key].a += stock;
+        if (record.grade === "B") stockSummary[key].b += stock;
+        if (record.grade === "RMA") stockSummary[key].rma += stock;
+        if (record.grade === "Bulges A") stockSummary[key].bulgesA += stock;
+        if (record.grade === "Bulges B") stockSummary[key].bulgesB += stock;
       });
 
       let totalA = 0;
@@ -287,10 +294,7 @@
       document.getElementById("mainRows").innerHTML = "";
       document.getElementById("bulgesRows").innerHTML = "";
 
-      Object.values(summary).forEach(function(item) {
-        const mainTotal = item.a + item.b + item.rma;
-        const bulgesTotal = item.bulgesA + item.bulgesB;
-
+      Object.values(stockSummary).forEach(function(item) {
         totalA += item.a;
         totalB += item.b;
         totalRMA += item.rma;
@@ -305,7 +309,7 @@
             <td>${item.a}</td>
             <td>${item.b}</td>
             <td>${item.rma}</td>
-            <td><strong>${mainTotal}</strong></td>
+            <td><strong>${item.a + item.b + item.rma}</strong></td>
           </tr>
         `;
 
@@ -316,7 +320,7 @@
             <td>${item.color}</td>
             <td>${item.bulgesA}</td>
             <td>${item.bulgesB}</td>
-            <td><strong>${bulgesTotal}</strong></td>
+            <td><strong>${item.bulgesA + item.bulgesB}</strong></td>
           </tr>
         `;
       });
