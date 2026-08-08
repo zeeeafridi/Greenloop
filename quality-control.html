@@ -4,80 +4,347 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quality Control | Greenloop FZC</title>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    *{box-sizing:border-box;font-family:Arial,sans-serif}body{margin:0;background:linear-gradient(135deg,#f5fbf7,#e7f3eb);color:#123c2b}
-    header{display:flex;align-items:center;gap:12px;padding:14px 8%;background:#0b5b38;color:#fff;font-size:22px;font-weight:bold}.header-logo{width:55px;height:42px;object-fit:contain}
-    .top-nav{padding:14px 8%;display:flex;gap:12px;flex-wrap:wrap;background:#e5f3ea}.top-nav a{padding:10px 16px;color:#0b5b38;background:#fff;border-radius:7px;text-decoration:none;font-weight:bold}
-    main{max-width:1150px;margin:auto;padding:45px 20px}.welcome-box{max-width:720px;margin:0 auto 42px;padding:30px 25px;text-align:center;background:rgba(255,255,255,.76);border:1px solid #d9ebe0;border-radius:24px;box-shadow:0 9px 24px rgba(14,85,50,.08)}
-    h1{margin:0 0 10px;font-size:39px;color:#10442f}.subtitle{margin:0;color:#526c5e;font-size:18px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:25px}
-    .card{position:relative;display:block;min-height:280px;padding:34px 24px;text-align:center;text-decoration:none;color:#123c2b;background:#fff;border:1px solid #d9ebe0;border-radius:22px;box-shadow:0 10px 25px rgba(14,85,50,.10);overflow:hidden;transition:transform .25s,box-shadow .25s}
-    .card:before{content:"";position:absolute;top:-85px;right:-85px;width:180px;height:180px;border-radius:50%;background:linear-gradient(135deg,rgba(31,158,92,.16),rgba(11,91,56,.04))}
-    .card:hover{transform:translateY(-9px);box-shadow:0 17px 34px rgba(14,85,50,.20)}.icon{position:relative;z-index:1;width:90px;height:90px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;border-radius:27px;background:linear-gradient(135deg,#1ba363,#07512f);box-shadow:0 12px 21px rgba(10,112,61,.28);color:#fff;font-size:40px;font-weight:bold}
-    .card h2{position:relative;z-index:1;margin:0 0 12px;color:#0b5b38;font-size:23px}.card p{position:relative;z-index:1;margin:0;color:#526c5e;font-size:14px;line-height:1.6}.open-text{position:relative;z-index:1;display:inline-block;margin-top:21px;padding:9px 14px;border-radius:20px;background:#e8f6ed;color:#0b5b38;font-size:13px;font-weight:bold}
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #f4fbf7, #e5f4eb);
+      color: #073d2a;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, #063e2a, #0b6a45);
+      color: white;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .brand img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: white;
+      padding: 3px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .top-actions button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      background: white;
+      color: #075334;
+      transition: 0.2s ease;
+    }
+
+    .top-actions button:hover {
+      transform: translateY(-2px);
+      background: #dcf5e6;
+    }
+
+    .logout-btn {
+      background: #d94343 !important;
+      color: white !important;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 45px 0 55px;
+    }
+
+    .hero {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(9, 113, 72, 0.13);
+      border-radius: 24px;
+      padding: 34px 20px;
+      box-shadow: 0 16px 45px rgba(6, 81, 50, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 999px;
+      background: #dcf5e6;
+      color: #087143;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 50px);
+      margin: 0;
+      letter-spacing: -1px;
+      color: #063e2a;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      color: #4d7061;
+      font-size: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(180px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: #063e2a;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid #d7ede0;
+      border-radius: 20px;
+      padding: 25px 21px;
+      min-height: 255px;
+      overflow: hidden;
+      box-shadow: 0 12px 25px rgba(5, 84, 49, 0.09);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      width: 145px;
+      height: 145px;
+      right: -65px;
+      top: -65px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(37, 169, 107, 0.16), rgba(37, 169, 107, 0));
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: #25a96b;
+      box-shadow: 0 20px 35px rgba(5, 84, 49, 0.18);
+    }
+
+    .icon {
+      width: 66px;
+      height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #087143, #25a96b);
+      color: white;
+      font-size: 31px;
+      font-weight: bold;
+      box-shadow: 0 9px 18px rgba(18, 138, 83, 0.28);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 21px;
+      color: #063e2a;
+    }
+
+    .card p {
+      margin: 0;
+      line-height: 1.55;
+      color: #607b6e;
+      font-size: 14px;
+    }
+
+    .open-text {
+      margin-top: auto;
+      padding-top: 22px;
+      color: #078047;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: #668174;
+      margin-top: 30px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 1050px) {
+      .grid {
+        grid-template-columns: repeat(3, minmax(200px, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .topbar {
+        padding: 15px 16px;
+      }
+
+      .brand {
+        font-size: 20px;
+      }
+
+      .top-actions {
+        width: 100%;
+      }
+
+      .top-actions button {
+        flex: 1;
+        padding: 10px 8px;
+      }
+
+      .container {
+        width: min(100% - 24px, 600px);
+        padding-top: 25px;
+      }
+
+      .hero {
+        padding: 28px 15px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: 210px;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <header><img src="looplogo.jpg" alt="Greenloop Logo" class="header-logo">Greenloop FZC</header>
-
-  <nav class="top-nav">
-    <a href="javascript:history.back()">Back</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="index.html">Home / Login</a>
-    <a href="#" onclick="logout();return false;">Logout</a>
-  </nav>
-
-  <main>
-    <div class="welcome-box">
-      <h1>Quality Control</h1>
-      <p class="subtitle">Select a process to continue.</p>
+  <header class="topbar">
+    <div class="brand">
+      <img src="looplogo.jpg" alt="Greenloop Logo">
+      <span>Greenloop FZC</span>
     </div>
 
-    <div class="cards">
+    <div class="top-actions">
+      <button onclick="goBack()">← Back</button>
+      <button onclick="location.href='dashboard.html'">⌂ Dashboard</button>
+      <button onclick="location.href='index.html'">⌂ Home</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-badge">QUALITY CONTROL DEPARTMENT</div>
+      <h1>Quality Control</h1>
+      <p>Select a process to continue.</p>
+    </section>
+
+    <section class="grid">
       <a href="stock-in.html" class="card">
         <div class="icon">↓</div>
         <h2>Inventory Entry</h2>
-        <p>Receive new phones and scan IMEI details.</p>
+        <p>Scan and register incoming mobile phones with IMEI, model, storage, color and grades.</p>
         <span class="open-text">Open Inventory Entry →</span>
       </a>
 
       <a href="repair-process.html" class="card">
-        <div class="icon">⚙</div>
+        <div class="icon">⌕</div>
         <h2>Repair Process</h2>
-        <p>Check phone problems and parts required for repair.</p>
+        <p>Check device problems, condition details, required repair parts and remarks.</p>
         <span class="open-text">Open Repair Process →</span>
       </a>
 
       <a href="lab-process.html" class="card">
-        <div class="icon">⌕</div>
+        <div class="icon">⚙</div>
         <h2>Lab Process</h2>
-        <p>Assign phones to technicians and save lab results.</p>
+        <p>Assign phones to technicians, record work completed, time used and repair result.</p>
         <span class="open-text">Open Lab Process →</span>
       </a>
 
       <a href="stock-out.html" class="card">
         <div class="icon">↑</div>
         <h2>Stock Out</h2>
-        <p>Scan IMEI and issue phones from Quality Control.</p>
+        <p>Scan IMEI and process outgoing phones with their saved inventory information.</p>
         <span class="open-text">Open Stock Out →</span>
       </a>
-    </div>
+
+      <a href="qc-report.html" class="card">
+        <div class="icon">▤</div>
+        <h2>QC Reports</h2>
+        <p>View complete Inventory Entry, Repair Process, Lab Process and Stock Out results.</p>
+        <span class="open-text">Open QC Reports →</span>
+      </a>
+    </section>
+
+    <p class="footer-note">Greenloop FZC • Quality Control Management</p>
   </main>
 
   <script>
-    const db=window.supabase.createClient(
-      'https://ohvplvdxflmgqoptwftk.supabase.co',
-      'sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH'
-    );
+    const SUPABASE_URL = "https://ohvplvdxflmgqoptwftk.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_XLlrS0fJoxZTVJkZg46GzA_KnPPPHnH";
 
-    async function logout(){
-      await db.auth.signOut();
-      window.location.href='index.html';
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        experimental: {
+          passkey: true
+        }
+      }
+    });
+
+    function goBack() {
+      if (history.length > 1) {
+        history.back();
+      } else {
+        location.href = "dashboard.html";
+      }
     }
 
-    db.auth.getSession().then(function(result){
-      if(!result.data.session)window.location.href='index.html';
-    });
+    async function logout() {
+      await db.auth.signOut();
+      location.href = "index.html";
+    }
+
+    async function checkLogin() {
+      const {
+        data: { session }
+      } = await db.auth.getSession();
+
+      if (!session) {
+        location.href = "index.html";
+      }
+    }
+
+    checkLogin();
   </script>
 </body>
 </html>
