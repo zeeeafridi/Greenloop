@@ -1,14 +1,3 @@
-Final Date-wise format ye hoga:
-
-```text
-Date | Today's Production | Today's Export | Balance
-```
-
-Sab models ka accumulated data aik line per date mein hoga. Bulges include nahi honge.
-
-`production-report.html` ka poora code replace karein:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -228,7 +217,7 @@ Sab models ka accumulated data aik line per date mein hoga. Bulges include nahi 
 
       document.getElementById("dailyTotals").innerHTML = `
         <tr>
-          <td>Grand Total Excluding Bulges</td>
+          <td>Grand Total</td>
           <td>${totalProduction}</td>
           <td>${totalExport}</td>
           <td></td>
@@ -352,4 +341,3 @@ Sab models ka accumulated data aik line per date mein hoga. Bulges include nahi 
   </script>
 </body>
 </html>
-```
