@@ -1,3 +1,12 @@
+`production-report.html` ka poora code replace karein. Is update mein:
+
+- **RMA** ka separate column hoga.
+- Closing Stock Total = Grade A + Grade B + RMA.
+- Bulges total mein include nahi honge.
+- Date-wise Production Details ke neeche totals honge.
+- Date-wise total mein Bulges A/B include nahi honge.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,7 +73,7 @@
 
     <div class="box">
       <h2>Closing Stock Summary</h2>
-      <p>Grade A and Grade B only. Bulges are not included in this total.</p>
+      <p>Grade A, Grade B and RMA only. Bulges are not included in this total.</p>
 
       <table>
         <thead>
@@ -74,6 +83,7 @@
             <th>Color</th>
             <th>Grade A</th>
             <th>Grade B</th>
+            <th>RMA</th>
             <th>Total Stock</th>
           </tr>
         </thead>
@@ -84,7 +94,6 @@
 
     <div class="box">
       <h2 class="bulges-title">Bulges Stock Summary</h2>
-      <p>Bulges are shown separately and are not included in Closing Stock Summary.</p>
 
       <table>
         <thead>
@@ -119,6 +128,7 @@
           </tr>
         </thead>
         <tbody id="detailRows"></tbody>
+        <tfoot id="detailTotals"></tfoot>
       </table>
     </div>
   </main>
@@ -131,7 +141,6 @@
 
     function formatDate(isoDate) {
       if (!isoDate) return "";
-
       const parts = isoDate.split("-");
       return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
@@ -140,7 +149,6 @@
       if (!value) return null;
 
       const parts = value.split("/");
-
       if (parts.length !== 3) return null;
 
       const day = parts[0].padStart(2, "0");
@@ -156,11 +164,7 @@
 
     function todayDate() {
       const today = new Date();
-      const day = String(today.getDate()).padStart(2, "0");
-      const month = String(today.getMonth() + 1).padStart(2, "0");
-      const year = today.getFullYear();
-
-      return `${day}/${month}/${year}`;
+      return `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
     }
 
     async function showReport() {
@@ -192,7 +196,15 @@
           record.record_date <= toDate;
       });
 
+      let totalProduction = 0;
+      let totalExport = 0;
+
       document.getElementById("detailRows").innerHTML = dateRecords.map(function(record) {
+        if (record.grade !== "Bulges A" && record.grade !== "Bulges B") {
+          totalProduction += Number(record.production) || 0;
+          totalExport += Number(record.export_qty) || 0;
+        }
+
         return `
           <tr>
             <td>${formatDate(record.record_date)}</td>
@@ -206,6 +218,15 @@
           </tr>
         `;
       }).join("");
+
+      document.getElementById("detailTotals").innerHTML = `
+        <tr>
+          <td colspan="5">Grand Total Excluding Bulges</td>
+          <td>${totalProduction}</td>
+          <td>${totalExport}</td>
+          <td></td>
+        </tr>
+      `;
 
       const latestRecords = {};
 
@@ -221,10 +242,7 @@
             record.grade
           ].join("|").toLowerCase();
 
-          if (
-            !latestRecords[key] ||
-            latestRecords[key].record_date <= record.record_date
-          ) {
+          if (!latestRecords[key] || latestRecords[key].record_date <= record.record_date) {
             latestRecords[key] = record;
           }
         });
@@ -245,6 +263,7 @@
             color: record.color,
             a: 0,
             b: 0,
+            rma: 0,
             bulgesA: 0,
             bulgesB: 0
           };
@@ -254,12 +273,14 @@
 
         if (record.grade === "A") summary[key].a += stock;
         if (record.grade === "B") summary[key].b += stock;
+        if (record.grade === "RMA") summary[key].rma += stock;
         if (record.grade === "Bulges A") summary[key].bulgesA += stock;
         if (record.grade === "Bulges B") summary[key].bulgesB += stock;
       });
 
       let totalA = 0;
       let totalB = 0;
+      let totalRMA = 0;
       let totalBulgesA = 0;
       let totalBulgesB = 0;
 
@@ -267,8 +288,12 @@
       document.getElementById("bulgesRows").innerHTML = "";
 
       Object.values(summary).forEach(function(item) {
+        const mainTotal = item.a + item.b + item.rma;
+        const bulgesTotal = item.bulgesA + item.bulgesB;
+
         totalA += item.a;
         totalB += item.b;
+        totalRMA += item.rma;
         totalBulgesA += item.bulgesA;
         totalBulgesB += item.bulgesB;
 
@@ -279,7 +304,8 @@
             <td>${item.color}</td>
             <td>${item.a}</td>
             <td>${item.b}</td>
-            <td><strong>${item.a + item.b}</strong></td>
+            <td>${item.rma}</td>
+            <td><strong>${mainTotal}</strong></td>
           </tr>
         `;
 
@@ -290,7 +316,7 @@
             <td>${item.color}</td>
             <td>${item.bulgesA}</td>
             <td>${item.bulgesB}</td>
-            <td><strong>${item.bulgesA + item.bulgesB}</strong></td>
+            <td><strong>${bulgesTotal}</strong></td>
           </tr>
         `;
       });
@@ -300,7 +326,8 @@
           <td colspan="3">Grand Total</td>
           <td>${totalA}</td>
           <td>${totalB}</td>
-          <td>${totalA + totalB}</td>
+          <td>${totalRMA}</td>
+          <td>${totalA + totalB + totalRMA}</td>
         </tr>
       `;
 
@@ -321,3 +348,4 @@
   </script>
 </body>
 </html>
+```
